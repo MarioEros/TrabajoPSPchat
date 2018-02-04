@@ -27,29 +27,35 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="jLEstado" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="jScrollPane1" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jTADetalles1" min="-2" pref="164" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="jTADetalles2" min="-2" pref="168" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jBDesconectarCliente" min="-2" pref="150" max="-2" attributes="0"/>
-                          <Component id="jBCerrar" min="-2" pref="150" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jBDesconectarCliente" min="-2" pref="150" max="-2" attributes="0"/>
+                                  <Component id="jBCerrar" min="-2" pref="150" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="jBEsperarCliente" min="-2" pref="150" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jTexto" min="-2" pref="419" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="32767" attributes="0"/>
-                      <Component id="jBEnviar" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLEstado" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jTexto" min="-2" pref="419" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="32767" attributes="0"/>
+                              <Component id="jBEnviar" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -60,7 +66,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                       <Component id="jTADetalles1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jTADetalles2" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -68,6 +74,8 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jBCerrar" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jBEsperarCliente" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="jBDesconectarCliente" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -148,6 +156,14 @@
           <Dimension value="[160, 90]"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBEsperarCliente">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Esperar Cliente"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBEsperarClienteActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

@@ -14,8 +14,8 @@ import java.util.HashMap;
 public class BaseDeDatosCutre extends HashMap<String, Usuario>{
 
     public BaseDeDatosCutre() {
-        this.put("Mario", new Usuario("admin", "Mario", "Rodriguez", "C/Pio Pio", "987654321"));
-        this.put("Paco", new Usuario("admin", "Paco", "Paquez", "C/General Paco", "646465655"));
-        this.put("Carlo", new Usuario("admin", "Carlo", "Magno", "C/Alejandia", "15654321"));
+        this.put("Mario", new Usuario("Mario", "admin", "Rodriguez", "C/Pio Pio", "987654321"));
+        this.put("Paco", new Usuario("Paco", "admin", "Paquez", "C/General Paco", "646465655"));
+        this.put("Carlo", new Usuario("Carlo", "admin", "Magno", "C/Alejandia", "15654321"));
     }
 }

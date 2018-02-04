@@ -23,7 +23,6 @@ public class Ventana extends javax.swing.JFrame {
     public static int NUM_PUERTO = 44444;
 
     public Ventana() {
-        PedirCredenciales();
         initComponents();
     }
 
@@ -38,6 +37,7 @@ public class Ventana extends javax.swing.JFrame {
         jTexto = new javax.swing.JTextField();
         jBEnviar = new javax.swing.JButton();
         jLUsuario = new javax.swing.JLabel();
+        jBConectar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -55,6 +55,13 @@ public class Ventana extends javax.swing.JFrame {
 
         jBEnviar.setText("Enviar");
 
+        jBConectar.setText("Conectar");
+        jBConectar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBConectarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -69,8 +76,10 @@ public class Ventana extends javax.swing.JFrame {
                         .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jBConectar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(155, 155, 155)
                         .addComponent(jBCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(8, 8, 8))
                     .addGroup(layout.createSequentialGroup()
@@ -83,9 +92,11 @@ public class Ventana extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jBCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jBCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jBConectar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -101,8 +112,18 @@ public class Ventana extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
+        try{
+            dos.writeUTF("/salir");
+            dos.close();
+            dis.close();
+            socket.close();
+        }catch(Exception e){e.printStackTrace();}
         System.exit(0);
     }//GEN-LAST:event_jBCerrarActionPerformed
+
+    private void jBConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConectarActionPerformed
+        PedirCredenciales();
+    }//GEN-LAST:event_jBConectarActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -138,6 +159,7 @@ public class Ventana extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBCerrar;
+    private javax.swing.JButton jBConectar;
     private javax.swing.JButton jBEnviar;
     private javax.swing.JLabel jLEstado;
     private javax.swing.JLabel jLUsuario;
@@ -151,26 +173,22 @@ public class Ventana extends javax.swing.JFrame {
     //Pedir credenciales bloquea la ventana hasta que el usuario se ha logeado.
     private void PedirCredenciales() {
         try {
+            jBConectar.setEnabled(false);
             socket = new Socket(InetAddress.getLocalHost(), NUM_PUERTO);
+                    //new Socket(InetAddress.getByAddress("188.127.166.98", new byte[]{(byte)188,(byte)127,(byte)166,(byte)98}), NUM_PUERTO);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
-        } catch (Exception ex) {
-            System.out.println("Error Fatal al intentar conectar");
-            ex.printStackTrace();
-        }
-        boolean autenticado = false;
-        try {
-            while (!autenticado) {
-                dos.writeUTF(JOptionPane.showInputDialog(this, "Intoduzca Usuario", "Credenciales", JOptionPane.INFORMATION_MESSAGE));
-                autenticado=dis.readBoolean();
-                if(autenticado){
-                    autenticado=false;
-                    dos.writeUTF(JOptionPane.showInputDialog(this, "Intoduzca Contraseña", "Credenciales", JOptionPane.INFORMATION_MESSAGE));
-                    autenticado=dis.readBoolean();
-                }
+            String user = JOptionPane.showInputDialog(this, "Intoduzca Usuario", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
+            String pass = JOptionPane.showInputDialog(this, "Intoduzca Contraseña", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
+            if (user!=null && pass!=null){
+                dos.writeUTF(user+"$$"+pass);
+                if(dis.readBoolean()) jTAChat.append("Logeado con el servidor!");
+                else jTAChat.append("Credenciales Erroneos");
+            }else{
+                jTAChat.append("Login cancelado\n");
             }
         } catch (Exception ex) {
-            System.out.println("Error de autenticacion.");
+            jTAChat.append("Error Fatal al intentar conectar.\n");
             ex.printStackTrace();
         }
     }

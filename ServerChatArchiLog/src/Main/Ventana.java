@@ -5,6 +5,8 @@
  */
 package Main;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -22,7 +24,12 @@ public class Ventana extends javax.swing.JFrame {
 
     public Ventana() {
         initComponents();
-        IniciarConexion();
+        try{
+            servidor = new ServerSocket(NUM_PUERTO);
+            EscribirEnChat("Servidor conectado.");
+        }catch(Exception ex){
+            EscribirEnChat("Error al iniciar el Servidor.");
+        }
     }
 
     /**
@@ -43,6 +50,7 @@ public class Ventana extends javax.swing.JFrame {
         jLEstado = new javax.swing.JLabel();
         jTADetalles2 = new javax.swing.JTextArea();
         jTADetalles1 = new javax.swing.JTextArea();
+        jBEsperarCliente = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -82,6 +90,13 @@ public class Ventana extends javax.swing.JFrame {
         jTADetalles1.setRows(5);
         jTADetalles1.setPreferredSize(new java.awt.Dimension(160, 90));
 
+        jBEsperarCliente.setText("Esperar Cliente");
+        jBEsperarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBEsperarClienteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,38 +104,43 @@ public class Ventana extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jTADetalles1, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jTADetalles2, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBDesconectarCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jBCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(8, 8, 8))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jBDesconectarCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jBCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(8, 8, 8))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jBEsperarCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jBEnviar)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jBEnviar)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jTADetalles1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jTADetalles2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jBCerrar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBEsperarCliente)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jBDesconectarCliente)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -155,6 +175,10 @@ public class Ventana extends javax.swing.JFrame {
         jTADetalles1.setText("Nombre: Paco\nDireccion: C\\Culo Nº2\nTlf: 665954266");
         jTADetalles2.setText("Ip: 59.18.65.155\nUsuario: SuperP");
     }//GEN-LAST:event_jBEnviarActionPerformed
+
+    private void jBEsperarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEsperarClienteActionPerformed
+        IniciarConexion();
+    }//GEN-LAST:event_jBEsperarClienteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -195,6 +219,7 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JButton jBCerrar;
     private javax.swing.JButton jBDesconectarCliente;
     private javax.swing.JButton jBEnviar;
+    private javax.swing.JButton jBEsperarCliente;
     private javax.swing.JLabel jLEstado;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTAChat;
@@ -204,20 +229,20 @@ public class Ventana extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void IniciarConexion() {
-        try {
-            EscribirEnChat("Creando conexion...");
-            servidor = new ServerSocket(NUM_PUERTO);
-            EscribirEnChat("Servidor conectado.");
-            s = new Socket();
-            HiloServidor hilo = new HiloServidor(this, s, servidor);
-            hilo.start();
-        } catch (Exception ex) {
-            EscribirEnChat("Error al crear conexion.");
-            ex.printStackTrace();
-        }
+        botCon(false);
+        HiloServidor hiloLector= new HiloServidor(this, s, servidor);
+        hiloLector.start();
     }
 
     public void EscribirEnChat(String texto) {
         jTAChat.append(texto + "\n");
+    }
+
+    public void botCon(boolean bool){
+        jBEsperarCliente.setEnabled(bool);
+    }
+
+    public void DatosUsuario(Usuario user) {
+        
     }
 }

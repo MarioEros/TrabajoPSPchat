@@ -32,51 +32,49 @@ public class HiloServidor extends Thread {
     }
 
     @Override
-    public void run() {
-        while (true) {
-            try {
-                ven.EscribirEnChat("Esperando un Cliente...");
-                this.socket = servidor.accept();
-                dis = new DataInputStream(socket.getInputStream());
-                dos = new DataOutputStream(socket.getOutputStream());
-                ven.EscribirEnChat("Autenticando cliente...");
-                while (!validar()) {
-                }
-                ven.EscribirEnChat("Cliente autenticado.");
-                LeerMensajes();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+    public void run() {try {
+            ven.EscribirEnChat("Creando conexion...");
+            socket = new Socket();
+            ven.EscribirEnChat("Esperando un Cliente...");
+            socket = servidor.accept();
+            dis = new DataInputStream(socket.getInputStream());
+            dos = new DataOutputStream(socket.getOutputStream());
+            boolean val = validar();
+            if (!val) {
+                ven.botCon(true);
+                ven.EscribirEnChat("Intento de login fallido.");
+                this.interrupt();
+            } else {
+                ven.EscribirEnChat("Usuario logeado con exito.");
             }
+        } catch (Exception ex) {
+            ven.EscribirEnChat("Error al crear conexion.");
+            ven.botCon(true);
+            ex.printStackTrace();
+            this.interrupt();
         }
     }
 
     //Se mantiene escuchando mensajes.
     private void LeerMensajes() {
-        while (!socket.isClosed()) {
-            try{
-                ven.EscribirEnChat(dis.readUTF());
-            }catch(Exception ex){}
-        }
     }
 
     //**Funciona**
     //@return Verdadero o falso dependiendo del si son correctos los credenciales.
     private boolean validar() {
-        try {
-            String cred = dis.readUTF();
-            if (db.containsKey(cred)) {
+        try{
+            String[] log = dis.readUTF().split("$$");
+            if (db.containsKey(log[0]) && db.get(log[0]).getContrasenna().equals(log[1])) {
                 dos.writeBoolean(true);
-                usuario = db.get(cred);
-                cred = dis.readUTF();
-                boolean correcto = usuario.getContrasenna().equals(cred);
-                dos.writeBoolean(correcto);
-                return correcto;
-            } else {
+                ven.DatosUsuario(db.get(log[0]));
+                return true;
+            }else{
                 dos.writeBoolean(false);
+                return false;
             }
         } catch (Exception ex) {
             ven.EscribirEnChat("Error fatal de login.");
+            return false;
         }
-        return false;
     }
 }

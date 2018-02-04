@@ -16,9 +16,9 @@ public class Usuario {
     private String Direccion;
     private String Telefono;
 
-    public Usuario(String Contrasenna, String Nombre, String Apellido, String Direccion, String Telefono) {
-        this.Contrasenna = Contrasenna;
+    public Usuario(String Nombre, String Contrasenna, String Apellido, String Direccion, String Telefono) {
         this.Nombre = Nombre;
+        this.Contrasenna = Contrasenna;
         this.Apellido = Apellido;
         this.Direccion = Direccion;
         this.Telefono = Telefono;
