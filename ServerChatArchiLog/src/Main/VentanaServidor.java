@@ -6,6 +6,7 @@
 package Main;
 
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,14 +16,15 @@ import java.util.Date;
  *
  * @author Eros
  */
-public class Ventana extends javax.swing.JFrame {
+public class VentanaServidor extends javax.swing.JFrame {
 
     public static int NUM_PUERTO = 44444;
     private static ServerSocket servidor;
-    private static Date Fecha;
     private static Socket s;
+    
+    private static Date Fecha;
 
-    public Ventana() {
+    public VentanaServidor() {
         initComponents();
         try{
             servidor = new ServerSocket(NUM_PUERTO);
@@ -168,7 +170,12 @@ public class Ventana extends javax.swing.JFrame {
     }//GEN-LAST:event_jBCerrarActionPerformed
 
     private void jBDesconectarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarClienteActionPerformed
-
+        try{
+            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+            dos.writeUTF("*/QUIT CLIENTE*");
+            dos.close();
+            s.close();
+        }catch (Exception e){e.printStackTrace();}
     }//GEN-LAST:event_jBDesconectarClienteActionPerformed
 
     private void jBEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEnviarActionPerformed
@@ -197,20 +204,21 @@ public class Ventana extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaServidor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaServidor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaServidor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaServidor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Ventana().setVisible(true);
+                new VentanaServidor().setVisible(true);
             }
         });
     }
@@ -230,7 +238,7 @@ public class Ventana extends javax.swing.JFrame {
 
     private void IniciarConexion() {
         botCon(false);
-        HiloServidor hiloLector= new HiloServidor(this, s, servidor);
+        HiloServidorReceptor hiloLector= new HiloServidorReceptor(this, s, servidor);
         hiloLector.start();
     }
 

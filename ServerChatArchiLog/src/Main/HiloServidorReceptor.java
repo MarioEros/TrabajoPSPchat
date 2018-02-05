@@ -14,17 +14,17 @@ import java.net.Socket;
  *
  * @author Eros
  */
-public class HiloServidor extends Thread {
+public class HiloServidorReceptor extends Thread {
 
     DataInputStream dis;
     DataOutputStream dos;
     Socket socket;
     ServerSocket servidor;
-    Ventana ven;
+    VentanaServidor ven;
     BaseDeDatosCutre db;
     public Usuario usuario;
 
-    public HiloServidor(Ventana ven, Socket socket, ServerSocket servidor) {
+    public HiloServidorReceptor(VentanaServidor ven, Socket socket, ServerSocket servidor) {
         this.socket = socket;
         this.servidor = servidor;
         this.ven = ven;
@@ -63,7 +63,8 @@ public class HiloServidor extends Thread {
     //@return Verdadero o falso dependiendo del si son correctos los credenciales.
     private boolean validar() {
         try{
-            String[] log = dis.readUTF().split("$$");
+            String leido = dis.readUTF();
+            String[] log = leido.split("##");
             if (db.containsKey(log[0]) && db.get(log[0]).getContrasenna().equals(log[1])) {
                 dos.writeBoolean(true);
                 ven.DatosUsuario(db.get(log[0]));

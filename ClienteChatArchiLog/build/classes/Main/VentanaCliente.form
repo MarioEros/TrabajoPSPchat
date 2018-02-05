@@ -38,6 +38,8 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jBConectar" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jBDesconectar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLUsuario" max="32767" attributes="0"/>
                       <EmptySpace min="-2" pref="155" max="-2" attributes="0"/>
                       <Component id="jBCerrar" min="-2" pref="150" max="-2" attributes="0"/>
@@ -63,6 +65,7 @@
                       <Component id="jLUsuario" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jBConectar" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBDesconectar" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="257" max="-2" attributes="0"/>
@@ -119,6 +122,15 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBConectarActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBDesconectar">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Desconectar"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBDesconectarActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

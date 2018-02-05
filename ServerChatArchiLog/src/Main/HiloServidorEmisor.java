@@ -13,14 +13,14 @@ import java.net.Socket;
  *  Este hilo se encargará de leer los mensajes del cliente y escribirlas en la sala de chat del servidor
  * @author Eros
  */
-public class HiloServidorEscritor  extends Thread {
+public class HiloServidorEmisor  extends Thread {
 
     DataInputStream dis;
     Socket socket;
     ServerSocket servidor;
-    Ventana ven;
+    VentanaServidor ven;
 
-    public HiloServidorEscritor(Ventana ven, Socket socket, ServerSocket servidor) {
+    public HiloServidorEmisor(VentanaServidor ven, Socket socket, ServerSocket servidor) {
         this.socket = socket;
         this.servidor = servidor;
         this.ven = ven;

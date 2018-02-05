@@ -15,14 +15,14 @@ import javax.swing.JOptionPane;
  *
  * @author Eros
  */
-public class Ventana extends javax.swing.JFrame {
+public class VentanaCliente extends javax.swing.JFrame {
 
     Socket socket;
     DataInputStream dis;
     DataOutputStream dos;
     public static int NUM_PUERTO = 44444;
 
-    public Ventana() {
+    public VentanaCliente() {
         initComponents();
     }
 
@@ -38,6 +38,7 @@ public class Ventana extends javax.swing.JFrame {
         jBEnviar = new javax.swing.JButton();
         jLUsuario = new javax.swing.JLabel();
         jBConectar = new javax.swing.JButton();
+        jBDesconectar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -62,6 +63,14 @@ public class Ventana extends javax.swing.JFrame {
             }
         });
 
+        jBDesconectar.setText("Desconectar");
+        jBDesconectar.setEnabled(false);
+        jBDesconectar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBDesconectarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -77,6 +86,8 @@ public class Ventana extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jBConectar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBDesconectar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(155, 155, 155)
@@ -96,7 +107,8 @@ public class Ventana extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jBCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jBConectar))
+                    .addComponent(jBConectar)
+                    .addComponent(jBDesconectar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -113,7 +125,6 @@ public class Ventana extends javax.swing.JFrame {
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
         try{
-            dos.writeUTF("/salir");
             dos.close();
             dis.close();
             socket.close();
@@ -124,6 +135,10 @@ public class Ventana extends javax.swing.JFrame {
     private void jBConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConectarActionPerformed
         PedirCredenciales();
     }//GEN-LAST:event_jBConectarActionPerformed
+
+    private void jBDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarActionPerformed
+        jTAChat.append("Aun no funciona, si me sobra tiempo lo intento poner.\n");
+    }//GEN-LAST:event_jBDesconectarActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -139,20 +154,21 @@ public class Ventana extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(VentanaCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Ventana().setVisible(true);
+                new VentanaCliente().setVisible(true);
             }
         });
     }
@@ -160,6 +176,7 @@ public class Ventana extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBCerrar;
     private javax.swing.JButton jBConectar;
+    private javax.swing.JButton jBDesconectar;
     private javax.swing.JButton jBEnviar;
     private javax.swing.JLabel jLEstado;
     private javax.swing.JLabel jLUsuario;
@@ -168,9 +185,6 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JTextField jTexto;
     // End of variables declaration//GEN-END:variables
 
-    
-    //**Funcionando, no tocar**
-    //Pedir credenciales bloquea la ventana hasta que el usuario se ha logeado.
     private void PedirCredenciales() {
         try {
             jBConectar.setEnabled(false);
@@ -181,15 +195,29 @@ public class Ventana extends javax.swing.JFrame {
             String user = JOptionPane.showInputDialog(this, "Intoduzca Usuario", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
             String pass = JOptionPane.showInputDialog(this, "Intoduzca Contraseña", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
             if (user!=null && pass!=null){
-                dos.writeUTF(user+"$$"+pass);
-                if(dis.readBoolean()) jTAChat.append("Logeado con el servidor!");
-                else jTAChat.append("Credenciales Erroneos");
+                dos.writeUTF(user+"##"+pass);
+                if(dis.readBoolean()){
+                    jTAChat.append("Logeado con el servidor!");
+                    jBDesconectar.setEnabled(true);
+                    ArrancarHilos();
+                }
+                else {
+                    jTAChat.append("Credenciales Erroneos");
+                    jBConectar.setEnabled(true);
+                }
             }else{
                 jTAChat.append("Login cancelado\n");
+                jBConectar.setEnabled(true);
             }
         } catch (Exception ex) {
             jTAChat.append("Error Fatal al intentar conectar.\n");
+            jBConectar.setEnabled(true);
             ex.printStackTrace();
         }
+    }
+
+    private void ArrancarHilos() {
+        HiloClienteEmisor HiloEscribir = new HiloClienteEmisor(this, socket, dos);
+        HiloClienteReceptor HiloLeer = new HiloClienteReceptor(this, socket, dis);
     }
 }
