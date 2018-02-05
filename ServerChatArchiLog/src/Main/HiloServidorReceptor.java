@@ -32,24 +32,27 @@ public class HiloServidorReceptor extends Thread {
     }
 
     @Override
-    public void run() {try {
-            ven.EscribirEnChat("Creando conexion...");
+    public void run() {
+        try {
+            ven.MensajesConsola("Creando conexion...");
             socket = new Socket();
-            ven.EscribirEnChat("Esperando un Cliente...");
+            ven.MensajesConsola("Esperando un Cliente...");
             socket = servidor.accept();
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
+            ven.setDos(dos);
             boolean val = validar();
             if (!val) {
-                ven.botCon(true);
-                ven.EscribirEnChat("Intento de login fallido.");
+                ven.setOnBotonConectar(true);
+                ven.MensajesConsola("Intento de login fallido.");
                 this.interrupt();
             } else {
-                ven.EscribirEnChat("Usuario logeado con exito.");
+                ven.MensajesConsola("Usuario logeado con exito.");
+                LeerMensajes();
             }
         } catch (Exception ex) {
-            ven.EscribirEnChat("Error al crear conexion.");
-            ven.botCon(true);
+            ven.MensajesConsola("Error al crear conexion.");
+            ven.setOnBotonConectar(true);
             ex.printStackTrace();
             this.interrupt();
         }
@@ -57,24 +60,39 @@ public class HiloServidorReceptor extends Thread {
 
     //Se mantiene escuchando mensajes.
     private void LeerMensajes() {
+        while (true) {
+            try {
+                String mens = dis.readUTF();
+                if (mens.equals("*/QUIT*")) {
+                    ven.MensajesConsola("Sesion desconectada por el Cliente.");
+                    ven.TerminarConexion();
+                    ven.setOnBotonConectar(true);
+                    break;
+                } else {
+                    ven.EscribirEnChat(mens, false);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
-    //**Funciona**
     //@return Verdadero o falso dependiendo del si son correctos los credenciales.
     private boolean validar() {
-        try{
+        try {
             String leido = dis.readUTF();
             String[] log = leido.split("##");
             if (db.containsKey(log[0]) && db.get(log[0]).getContrasenna().equals(log[1])) {
                 dos.writeBoolean(true);
-                ven.DatosUsuario(db.get(log[0]));
+                ven.setUsuario(db.get(log[0]));
+                ven.DatosUsuario();
                 return true;
-            }else{
+            } else {
                 dos.writeBoolean(false);
                 return false;
             }
         } catch (Exception ex) {
-            ven.EscribirEnChat("Error fatal de login.");
+            ven.MensajesConsola("Error fatal de login.");
             return false;
         }
     }

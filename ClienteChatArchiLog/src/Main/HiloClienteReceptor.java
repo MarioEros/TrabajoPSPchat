@@ -12,8 +12,8 @@ import java.net.Socket;
  *
  * @author Eros
  */
-public class HiloClienteReceptor extends Thread{
-    
+public class HiloClienteReceptor extends Thread {
+
     VentanaCliente ven;
     Socket socket;
     DataInputStream dis;
@@ -23,4 +23,23 @@ public class HiloClienteReceptor extends Thread{
         this.socket = socket;
         this.dis = dis;
     }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                String mensaje = dis.readUTF();
+                if (mensaje.equals("*/QUIT*")) {
+                    ven.MensajesConsola("Conexion cerrada desde el Servidor.");
+                    ven.setOnBotonConectar(true);
+                    break;
+                } else {
+                    ven.EscribirEnChat(mensaje, true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

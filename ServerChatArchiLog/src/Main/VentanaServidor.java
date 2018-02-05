@@ -5,8 +5,6 @@
  */
 package Main;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,18 +17,21 @@ import java.util.Date;
 public class VentanaServidor extends javax.swing.JFrame {
 
     public static int NUM_PUERTO = 44444;
-    private static ServerSocket servidor;
-    private static Socket s;
-    
-    private static Date Fecha;
+    private ServerSocket servidor;
+    private Socket s;
+    private HiloServidorReceptor hiloRecep;
+    private Usuario user;
+    private DataOutputStream dos;
+
+    private Date fecha;
 
     public VentanaServidor() {
         initComponents();
-        try{
+        try {
             servidor = new ServerSocket(NUM_PUERTO);
-            EscribirEnChat("Servidor conectado.");
-        }catch(Exception ex){
-            EscribirEnChat("Error al iniciar el Servidor.");
+            MensajesConsola("Servidor conectado.");
+        } catch (Exception ex) {
+            MensajesConsola("Error al iniciar el Servidor.");
         }
     }
 
@@ -69,6 +70,7 @@ public class VentanaServidor extends javax.swing.JFrame {
         });
 
         jBDesconectarCliente.setText("Desconectar Cliente");
+        jBDesconectarCliente.setEnabled(false);
         jBDesconectarCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBDesconectarClienteActionPerformed(evt);
@@ -170,17 +172,26 @@ public class VentanaServidor extends javax.swing.JFrame {
     }//GEN-LAST:event_jBCerrarActionPerformed
 
     private void jBDesconectarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarClienteActionPerformed
-        try{
-            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-            dos.writeUTF("*/QUIT CLIENTE*");
+        try {
+            dos.writeUTF("*/QUIT*");
             dos.close();
             s.close();
-        }catch (Exception e){e.printStackTrace();}
+            MensajesConsola("Cliente expulsado por el servidor");
+        } catch (Exception e) {
+            MensajesConsola("Cliente expulsado por el servidor");
+        }
+        setOnBotonConectar(true);
     }//GEN-LAST:event_jBDesconectarClienteActionPerformed
 
     private void jBEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEnviarActionPerformed
-        jTADetalles1.setText("Nombre: Paco\nDireccion: C\\Culo Nº2\nTlf: 665954266");
-        jTADetalles2.setText("Ip: 59.18.65.155\nUsuario: SuperP");
+        String texto = jTexto.getText();
+        EscribirEnChat(texto, true);
+        try {
+            dos.writeUTF(texto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        jTexto.setText("");
     }//GEN-LAST:event_jBEnviarActionPerformed
 
     private void jBEsperarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEsperarClienteActionPerformed
@@ -237,20 +248,44 @@ public class VentanaServidor extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void IniciarConexion() {
-        botCon(false);
-        HiloServidorReceptor hiloLector= new HiloServidorReceptor(this, s, servidor);
-        hiloLector.start();
+        setOnBotonConectar(false);
+        hiloRecep = new HiloServidorReceptor(this, s, servidor);
+        hiloRecep.start();
     }
 
-    public void EscribirEnChat(String texto) {
+    public void TerminarConexion() {
+        hiloRecep.interrupt();
+        try {
+            s.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void EscribirEnChat(String texto, boolean isServer) {
+        jTAChat.append((isServer ? "Servidor: " : user.getNombre() + ": ") + texto + "\n");
+    }
+
+    public void MensajesConsola(String texto) {
         jTAChat.append(texto + "\n");
     }
 
-    public void botCon(boolean bool){
-        jBEsperarCliente.setEnabled(bool);
+    public void setUsuario(Usuario user) {
+        this.user = user;
     }
 
-    public void DatosUsuario(Usuario user) {
-        
+    public void DatosUsuario() {
+        jTADetalles1.setText(String.format("Nombre: %s\nDireccion: %s\nTlf: %s", user.getApellido(), user.getDireccion(), user.getTelefono()));
+        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s","Hola",user.getNombre()));
+        //Da fallo con s.getInetAddress().toString()*********************************************************************************************************
+    }
+    
+    public void setDos(DataOutputStream dos){
+        this.dos = dos;
+    }
+    
+    public void setOnBotonConectar(boolean isConectar){
+        jBEsperarCliente.setEnabled(isConectar);
+        jBDesconectarCliente.setEnabled(!isConectar);
     }
 }

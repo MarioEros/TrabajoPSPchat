@@ -20,6 +20,8 @@ public class VentanaCliente extends javax.swing.JFrame {
     Socket socket;
     DataInputStream dis;
     DataOutputStream dos;
+    String User;
+    HiloClienteReceptor hiloRecep;
     public static int NUM_PUERTO = 44444;
 
     public VentanaCliente() {
@@ -55,6 +57,11 @@ public class VentanaCliente extends javax.swing.JFrame {
         });
 
         jBEnviar.setText("Enviar");
+        jBEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBEnviarActionPerformed(evt);
+            }
+        });
 
         jBConectar.setText("Conectar");
         jBConectar.addActionListener(new java.awt.event.ActionListener() {
@@ -124,11 +131,14 @@ public class VentanaCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
-        try{
+        try {
+            dos.writeUTF("*/QUIT*");
             dos.close();
             dis.close();
             socket.close();
-        }catch(Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         System.exit(0);
     }//GEN-LAST:event_jBCerrarActionPerformed
 
@@ -137,8 +147,25 @@ public class VentanaCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jBConectarActionPerformed
 
     private void jBDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarActionPerformed
-        jTAChat.append("Aun no funciona, si me sobra tiempo lo intento poner.\n");
+        try {
+            dos.writeUTF("*/QUIT*");
+            socket.close();
+            setOnBotonConectar(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }//GEN-LAST:event_jBDesconectarActionPerformed
+
+    private void jBEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEnviarActionPerformed
+        String texto = jTexto.getText();
+        EscribirEnChat(texto, false);
+        try {
+            dos.writeUTF(texto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        jTexto.setText("");
+    }//GEN-LAST:event_jBEnviarActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -187,37 +214,51 @@ public class VentanaCliente extends javax.swing.JFrame {
 
     private void PedirCredenciales() {
         try {
-            jBConectar.setEnabled(false);
+            setOnBotonConectar(false);
             socket = new Socket(InetAddress.getLocalHost(), NUM_PUERTO);
-                    //new Socket(InetAddress.getByAddress("188.127.166.98", new byte[]{(byte)188,(byte)127,(byte)166,(byte)98}), NUM_PUERTO);
+            //new Socket(InetAddress.getByAddress("188.127.166.98", new byte[]{(byte)188,(byte)127,(byte)166,(byte)98}), NUM_PUERTO);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
             String user = JOptionPane.showInputDialog(this, "Intoduzca Usuario", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
             String pass = JOptionPane.showInputDialog(this, "Intoduzca Contraseña", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
-            if (user!=null && pass!=null){
-                dos.writeUTF(user+"##"+pass);
-                if(dis.readBoolean()){
-                    jTAChat.append("Logeado con el servidor!");
+            if (user != null && pass != null) {
+                dos.writeUTF(user + "##" + pass);
+                if (dis.readBoolean()) {
+                    MensajesConsola("Logeado con el servidor!");
                     jBDesconectar.setEnabled(true);
+                    User = user;
+                    setOnBotonConectar(false);
                     ArrancarHilos();
+                } else {
+                    MensajesConsola("Credenciales Erroneos");
+                    setOnBotonConectar(true);
                 }
-                else {
-                    jTAChat.append("Credenciales Erroneos");
-                    jBConectar.setEnabled(true);
-                }
-            }else{
-                jTAChat.append("Login cancelado\n");
-                jBConectar.setEnabled(true);
+            } else {
+                MensajesConsola("Login cancelado.");
+                setOnBotonConectar(true);
             }
         } catch (Exception ex) {
-            jTAChat.append("Error Fatal al intentar conectar.\n");
+            MensajesConsola("Error Fatal al intentar conectar.");
             jBConectar.setEnabled(true);
             ex.printStackTrace();
         }
     }
 
     private void ArrancarHilos() {
-        HiloClienteEmisor HiloEscribir = new HiloClienteEmisor(this, socket, dos);
-        HiloClienteReceptor HiloLeer = new HiloClienteReceptor(this, socket, dis);
+        hiloRecep = new HiloClienteReceptor(this, socket, dis);
+        hiloRecep.start();
+    }
+
+    public void EscribirEnChat(String texto, boolean isServer) {
+        jTAChat.append((isServer ? "Servidor: " : User + ": ") + texto + "\n");
+    }
+
+    public void MensajesConsola(String texto) {
+        jTAChat.append(texto + "\n");
+    }
+
+    public void setOnBotonConectar(boolean isConectar) {
+        jBConectar.setEnabled(isConectar);
+        jBDesconectar.setEnabled(!isConectar);
     }
 }
