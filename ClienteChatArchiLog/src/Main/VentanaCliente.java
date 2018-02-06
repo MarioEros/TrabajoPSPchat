@@ -7,7 +7,6 @@ package Main;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import javax.swing.JOptionPane;
 
@@ -234,6 +233,7 @@ public class VentanaCliente extends javax.swing.JFrame {
                     setOnBotonConectar(true);
                 }
             } else {
+                dos.writeUTF("**NULL**" + "##" + "**NULL**");
                 MensajesConsola("Login cancelado.");
                 setOnBotonConectar(true);
             }
