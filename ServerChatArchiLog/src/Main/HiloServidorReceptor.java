@@ -54,7 +54,6 @@ public class HiloServidorReceptor extends Thread {
             ven.MensajesConsola("Error al crear conexion.");
             ven.setOnBotonConectar(true);
             ex.printStackTrace();
-            this.interrupt();
         }
     }
 

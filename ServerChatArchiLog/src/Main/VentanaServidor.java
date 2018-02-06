@@ -6,9 +6,12 @@
 package Main;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,6 +20,7 @@ import java.util.Date;
 public class VentanaServidor extends javax.swing.JFrame {
 
     public static int NUM_PUERTO = 44444;
+    public static EstructuraFicheros EstFich;
     private ServerSocket servidor;
     private Socket s;
     private HiloServidorReceptor hiloRecep;
@@ -50,10 +54,12 @@ public class VentanaServidor extends javax.swing.JFrame {
         jBDesconectarCliente = new javax.swing.JButton();
         jTexto = new javax.swing.JTextField();
         jBEnviar = new javax.swing.JButton();
-        jLEstado = new javax.swing.JLabel();
+        jLCarpCompartida = new javax.swing.JLabel();
         jTADetalles2 = new javax.swing.JTextArea();
         jTADetalles1 = new javax.swing.JTextArea();
         jBEsperarCliente = new javax.swing.JButton();
+        jBCompartCarp = new javax.swing.JButton();
+        jLEstado = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -78,11 +84,15 @@ public class VentanaServidor extends javax.swing.JFrame {
         });
 
         jBEnviar.setText("Enviar");
+        jBEnviar.setEnabled(false);
         jBEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBEnviarActionPerformed(evt);
             }
         });
+
+        jLCarpCompartida.setText("Ninguna carpeta compartida");
+        jLCarpCompartida.setEnabled(false);
 
         jTADetalles2.setEditable(false);
         jTADetalles2.setColumns(20);
@@ -98,6 +108,13 @@ public class VentanaServidor extends javax.swing.JFrame {
         jBEsperarCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBEsperarClienteActionPerformed(evt);
+            }
+        });
+
+        jBCompartCarp.setText("Selec. Carpeta Compartida");
+        jBCompartCarp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBCompartCarpActionPerformed(evt);
             }
         });
 
@@ -125,6 +142,10 @@ public class VentanaServidor extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLCarpCompartida, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jBCompartCarp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jScrollPane1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -134,8 +155,8 @@ public class VentanaServidor extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jTADetalles1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -153,8 +174,12 @@ public class VentanaServidor extends javax.swing.JFrame {
                     .addComponent(jTexto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBEnviar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLCarpCompartida, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBCompartCarp))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -203,6 +228,21 @@ public class VentanaServidor extends javax.swing.JFrame {
         IniciarConexion();
     }//GEN-LAST:event_jBEsperarClienteActionPerformed
 
+    private void jBCompartCarpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCompartCarpActionPerformed
+        String directorio="";
+        JFileChooser fileChoo = new JFileChooser();
+        fileChoo.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChoo.setDialogTitle("Selecciona la carpeta a compartir");
+        int returnVal = fileChoo.showDialog(fileChoo, "Seleccionar");
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            File file = fileChoo.getSelectedFile();
+            directorio = file.getAbsolutePath();
+        }
+        if (directorio.equals("")){
+            JOptionPane.showMessageDialog(this, "Debes elegir un directorio para poder compartir.");
+        }
+    }//GEN-LAST:event_jBCompartCarpActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -241,9 +281,11 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBCerrar;
+    private javax.swing.JButton jBCompartCarp;
     private javax.swing.JButton jBDesconectarCliente;
     private javax.swing.JButton jBEnviar;
     private javax.swing.JButton jBEsperarCliente;
+    private javax.swing.JLabel jLCarpCompartida;
     private javax.swing.JLabel jLEstado;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTAChat;
@@ -282,7 +324,6 @@ public class VentanaServidor extends javax.swing.JFrame {
     public void DatosUsuario() {
         jTADetalles1.setText(String.format("Nombre: %s\nDireccion: %s\nTlf: %s", user.getApellido(), user.getDireccion(), user.getTelefono()));
         jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s",s.getInetAddress().toString(),user.getNombre()));
-        //Da fallo con s.getInetAddress().toString()*********************************************************************************************************
     }
     
     public void setDos(DataOutputStream dos, Socket soc){
@@ -292,6 +333,7 @@ public class VentanaServidor extends javax.swing.JFrame {
     
     public void setOnBotonConectar(boolean isConectar){
         jBEsperarCliente.setEnabled(isConectar);
+        jBEnviar.setEnabled(!isConectar);
         jBDesconectarCliente.setEnabled(!isConectar);
     }
 }

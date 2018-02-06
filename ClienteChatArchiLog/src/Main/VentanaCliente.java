@@ -56,6 +56,7 @@ public class VentanaCliente extends javax.swing.JFrame {
         });
 
         jBEnviar.setText("Enviar");
+        jBEnviar.setEnabled(false);
         jBEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBEnviarActionPerformed(evt);
@@ -259,6 +260,7 @@ public class VentanaCliente extends javax.swing.JFrame {
 
     public void setOnBotonConectar(boolean isConectar) {
         jBConectar.setEnabled(isConectar);
+        jBEnviar.setEnabled(!isConectar);
         jBDesconectar.setEnabled(!isConectar);
     }
 }
