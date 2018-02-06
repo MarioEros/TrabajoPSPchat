@@ -40,7 +40,7 @@ public class HiloServidorReceptor extends Thread {
             socket = servidor.accept();
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
-            ven.setDos(dos);
+            ven.setDos(dos,socket);
             boolean val = validar();
             if (!val) {
                 ven.setOnBotonConectar(true);
@@ -73,6 +73,7 @@ public class HiloServidorReceptor extends Thread {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                break;
             }
         }
     }

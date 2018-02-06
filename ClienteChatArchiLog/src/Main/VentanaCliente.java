@@ -215,7 +215,7 @@ public class VentanaCliente extends javax.swing.JFrame {
     private void PedirCredenciales() {
         try {
             setOnBotonConectar(false);
-            socket = new Socket(InetAddress.getLocalHost(), NUM_PUERTO);
+            socket = new Socket("127.0.0.1", NUM_PUERTO);
             //new Socket(InetAddress.getByAddress("188.127.166.98", new byte[]{(byte)188,(byte)127,(byte)166,(byte)98}), NUM_PUERTO);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());

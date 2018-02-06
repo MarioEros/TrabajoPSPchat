@@ -162,18 +162,23 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
         try {
-            if (servidor != null) {
-                servidor.close();
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            dos.writeUTF("*/QUIT*");
+            hiloRecep.interrupt();
+            dos.close();
+            s.close();
+            servidor.close();
+            MensajesConsola("Cliente expulsado por el servidor");
+        } catch (Exception e) {
+            MensajesConsola("Cliente expulsado por el servidor");
         }
+        setOnBotonConectar(true);
         System.exit(0);
     }//GEN-LAST:event_jBCerrarActionPerformed
 
     private void jBDesconectarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarClienteActionPerformed
         try {
             dos.writeUTF("*/QUIT*");
+            hiloRecep.interrupt();
             dos.close();
             s.close();
             MensajesConsola("Cliente expulsado por el servidor");
@@ -276,12 +281,13 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     public void DatosUsuario() {
         jTADetalles1.setText(String.format("Nombre: %s\nDireccion: %s\nTlf: %s", user.getApellido(), user.getDireccion(), user.getTelefono()));
-        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s","Hola",user.getNombre()));
+        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s",s.getInetAddress().toString(),user.getNombre()));
         //Da fallo con s.getInetAddress().toString()*********************************************************************************************************
     }
     
-    public void setDos(DataOutputStream dos){
+    public void setDos(DataOutputStream dos, Socket soc){
         this.dos = dos;
+        this.s = soc;
     }
     
     public void setOnBotonConectar(boolean isConectar){
