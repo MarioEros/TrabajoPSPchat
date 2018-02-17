@@ -22,10 +22,11 @@ public class VentanaServidor extends javax.swing.JFrame {
     public static int NUM_PUERTO = 44444;
     public static EstructuraFicheros EstFich;
     private ServerSocket servidor;
-    private Socket s;
+    private Socket socket;
     private HiloServidorReceptor hiloRecep;
     private Usuario user;
     private DataOutputStream dos;
+    private File archi;
 
     private Date fecha;
 
@@ -190,7 +191,7 @@ public class VentanaServidor extends javax.swing.JFrame {
             dos.writeUTF("*/QUIT*");
             hiloRecep.interrupt();
             dos.close();
-            s.close();
+            socket.close();
             servidor.close();
             MensajesConsola("Cliente expulsado por el servidor");
         } catch (Exception e) {
@@ -205,7 +206,7 @@ public class VentanaServidor extends javax.swing.JFrame {
             dos.writeUTF("*/QUIT*");
             hiloRecep.interrupt();
             dos.close();
-            s.close();
+            socket.close();
             MensajesConsola("Cliente expulsado por el servidor");
         } catch (Exception e) {
             MensajesConsola("Cliente expulsado por el servidor");
@@ -235,8 +236,8 @@ public class VentanaServidor extends javax.swing.JFrame {
         fileChoo.setDialogTitle("Selecciona la carpeta a compartir");
         int returnVal = fileChoo.showDialog(fileChoo, "Seleccionar");
         if (returnVal == JFileChooser.APPROVE_OPTION){
-            File file = fileChoo.getSelectedFile();
-            directorio = file.getAbsolutePath();
+            archi = fileChoo.getSelectedFile();
+            jLCarpCompartida.setText(archi.getName());
         }
         if (directorio.equals("")){
             JOptionPane.showMessageDialog(this, "Debes elegir un directorio para poder compartir.");
@@ -296,14 +297,14 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     private void IniciarConexion() {
         setOnBotonConectar(false);
-        hiloRecep = new HiloServidorReceptor(this, s, servidor);
+        hiloRecep = new HiloServidorReceptor(this, socket, servidor);
         hiloRecep.start();
     }
 
     public void TerminarConexion() {
         hiloRecep.interrupt();
         try {
-            s.close();
+            socket.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -323,17 +324,21 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     public void DatosUsuario() {
         jTADetalles1.setText(String.format("Nombre: %s\nDireccion: %s\nTlf: %s", user.getApellido(), user.getDireccion(), user.getTelefono()));
-        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s",s.getInetAddress().toString(),user.getNombre()));
+        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s",socket.getInetAddress().toString(),user.getNombre()));
     }
     
     public void setDos(DataOutputStream dos, Socket soc){
         this.dos = dos;
-        this.s = soc;
+        this.socket = soc;
     }
     
     public void setOnBotonConectar(boolean isConectar){
         jBEsperarCliente.setEnabled(isConectar);
         jBEnviar.setEnabled(!isConectar);
         jBDesconectarCliente.setEnabled(!isConectar);
+    }
+    
+    public void barraEstado(String stado){
+        jLEstado.setText(stado);
     }
 }

@@ -16,13 +16,14 @@ import java.net.Socket;
  */
 public class HiloServidorReceptor extends Thread {
 
-    DataInputStream dis;
-    DataOutputStream dos;
-    Socket socket;
-    ServerSocket servidor;
-    VentanaServidor ven;
-    BaseDeDatosCutre db;
+    private DataInputStream dis;
+    private DataOutputStream dos;
+    private Socket socket;
+    private ServerSocket servidor;
+    private VentanaServidor ven;
+    private BaseDeDatosCutre db;
     public Usuario usuario;
+    
 
     public HiloServidorReceptor(VentanaServidor ven, Socket socket, ServerSocket servidor) {
         this.socket = socket;
