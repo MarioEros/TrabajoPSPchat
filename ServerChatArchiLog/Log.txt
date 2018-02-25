@@ -69,3 +69,16 @@
 25.02.18 15:28:58-->Mario logeado.
 25.02.18 15:29:09-->Cliente desconectado
 25.02.18 15:29:09-->Servidor cerrado
+25.02.18 15:42:13-->Servidor iniciado
+25.02.18 15:42:13-->Clave cargada
+25.02.18 15:43:24-->Servidor iniciado
+25.02.18 15:43:24-->Clave cargada
+25.02.18 15:43:53-->Cliente desconectado
+25.02.18 15:43:53-->Servidor cerrado
+25.02.18 15:45:30-->Servidor iniciado
+25.02.18 15:45:30-->Clave cargada
+25.02.18 15:49:57-->Servidor iniciado
+25.02.18 15:50:09-->Login fallido
+25.02.18 15:50:14-->Mario logeado.
+25.02.18 15:50:20-->Cliente desconectado
+25.02.18 15:50:20-->Servidor cerrado

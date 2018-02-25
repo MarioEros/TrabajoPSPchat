@@ -56,3 +56,23 @@
 25.02.18 15:28:58-->logeado como Mario
 25.02.18 15:29:09-->Desconectado del servidor
 25.02.18 15:29:09-->Cliente cerrado
+25.02.18 15:42:16-->Cliente iniciado
+25.02.18 15:42:17-->Clave cargada
+25.02.18 15:43:26-->Cliente iniciado
+25.02.18 15:43:27-->Clave cargada
+25.02.18 15:45:32-->Cliente iniciado
+25.02.18 15:45:32-->Clave cargada
+25.02.18 15:45:51-->Cliente iniciado
+25.02.18 15:45:51-->Clave cargada
+25.02.18 15:46:20-->Cliente iniciado
+25.02.18 15:46:21-->Clave cargada
+25.02.18 15:48:01-->Cliente iniciado
+25.02.18 15:48:01-->Clave cargada
+25.02.18 15:49:36-->Cliente iniciado
+25.02.18 15:49:36-->Clave cargada
+25.02.18 15:49:59-->Cliente iniciado
+25.02.18 15:49:59-->Clave cargada
+25.02.18 15:50:09-->Login fallido
+25.02.18 15:50:14-->logeado como Mario
+25.02.18 15:50:20-->Desconectado del servidor
+25.02.18 15:50:21-->Cliente cerrado

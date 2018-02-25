@@ -368,12 +368,10 @@ public class VentanaCliente extends javax.swing.JFrame {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivoClave));
             Key clave = (Key)ois.readObject();
-            encrip = Cipher.getInstance("AES/CBC/NoPadding");
-            desencrip = Cipher.getInstance("AES/CBC/NoPadding");
-            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
-            encrip.init(Cipher.ENCRYPT_MODE, clave,ivspec);
-            desencrip.init(Cipher.DECRYPT_MODE, clave,ivspec);
+            encrip = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            desencrip = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            encrip.init(Cipher.ENCRYPT_MODE, clave);
+            desencrip.init(Cipher.DECRYPT_MODE, clave);
             escribirLog("Clave cargada");
         } catch (Exception ex) {
             EscribirEnChat("Error al cargar claves", true);
