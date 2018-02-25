@@ -31,6 +31,7 @@ public class HiloClienteReceptor extends Thread {
                 String mensaje = dis.readUTF();
                 if (mensaje.equals("*/QUIT*")) {
                     ven.MensajesConsola("Conexion cerrada desde el Servidor.");
+                    ven.escribirLog("Desconectado del servidor");
                     ven.setOnBotonConectar(true);
                     break;
                 } else {

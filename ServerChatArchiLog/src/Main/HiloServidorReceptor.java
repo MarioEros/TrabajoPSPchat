@@ -23,7 +23,6 @@ public class HiloServidorReceptor extends Thread {
     private VentanaServidor ven;
     private BaseDeDatosCutre db;
     public Usuario usuario;
-    
 
     public HiloServidorReceptor(VentanaServidor ven, Socket socket, ServerSocket servidor) {
         this.socket = socket;
@@ -35,17 +34,16 @@ public class HiloServidorReceptor extends Thread {
     @Override
     public void run() {
         try {
-            ven.MensajesConsola("Creando conexion...");
-            socket = new Socket();
-            ven.MensajesConsola("Esperando un Cliente...");
+            ven.MensajesConsola("Creando conexion, esperando un Cliente...");
             socket = servidor.accept();
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
-            ven.setDos(dos,socket);
+            ven.setDos(dos, socket);
             boolean val = validar();
             if (!val) {
                 ven.setOnBotonConectar(true);
                 ven.MensajesConsola("Intento de login fallido.");
+                ven.escribirLog("Login fallido");
                 this.interrupt();
             } else {
                 ven.MensajesConsola("Usuario logeado con exito.");
@@ -65,6 +63,7 @@ public class HiloServidorReceptor extends Thread {
                 String mens = dis.readUTF();
                 if (mens.equals("*/QUIT*")) {
                     ven.MensajesConsola("Sesion desconectada por el Cliente.");
+                    ven.escribirLog("Cliente desconectado.");
                     ven.TerminarConexion();
                     ven.setOnBotonConectar(true);
                     break;

@@ -5,11 +5,16 @@
  */
 package Main;
 
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -19,22 +24,23 @@ import javax.swing.JOptionPane;
  */
 public class VentanaServidor extends javax.swing.JFrame {
 
-    public static int NUM_PUERTO = 44444;
+    public static int NUM_PUERTO_MENS = 44444;
+    public static int NUM_PUERTO_FICH = 55555;
     public static EstructuraFicheros EstFich;
     private ServerSocket servidor;
     private Socket socket;
     private HiloServidorReceptor hiloRecep;
     private Usuario user;
     private DataOutputStream dos;
-    private File archi;
-
+    private Archivos archi;
     private Date fecha;
 
     public VentanaServidor() {
         initComponents();
         try {
-            servidor = new ServerSocket(NUM_PUERTO);
+            servidor = new ServerSocket(NUM_PUERTO_MENS);
             MensajesConsola("Servidor conectado.");
+            escribirLog("Servidor iniciado");
         } catch (Exception ex) {
             MensajesConsola("Error al iniciar el Servidor.");
         }
@@ -194,9 +200,12 @@ public class VentanaServidor extends javax.swing.JFrame {
             socket.close();
             servidor.close();
             MensajesConsola("Cliente expulsado por el servidor");
+            escribirLog("Cliente desconectado");
         } catch (Exception e) {
             MensajesConsola("Cliente expulsado por el servidor");
+            escribirLog("Cliente desconectado");
         }
+        escribirLog("Servidor cerrado");
         setOnBotonConectar(true);
         System.exit(0);
     }//GEN-LAST:event_jBCerrarActionPerformed
@@ -211,6 +220,7 @@ public class VentanaServidor extends javax.swing.JFrame {
         } catch (Exception e) {
             MensajesConsola("Cliente expulsado por el servidor");
         }
+        escribirLog("Cliente desconectado");
         setOnBotonConectar(true);
     }//GEN-LAST:event_jBDesconectarClienteActionPerformed
 
@@ -230,16 +240,16 @@ public class VentanaServidor extends javax.swing.JFrame {
     }//GEN-LAST:event_jBEsperarClienteActionPerformed
 
     private void jBCompartCarpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCompartCarpActionPerformed
-        String directorio="";
         JFileChooser fileChoo = new JFileChooser();
         fileChoo.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fileChoo.setDialogTitle("Selecciona la carpeta a compartir");
         int returnVal = fileChoo.showDialog(fileChoo, "Seleccionar");
-        if (returnVal == JFileChooser.APPROVE_OPTION){
-            archi = fileChoo.getSelectedFile();
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            archi = new Archivos(fileChoo.getSelectedFile());
             jLCarpCompartida.setText(archi.getName());
-        }
-        if (directorio.equals("")){
+            HiloServidorArchivos hiloArchi = new HiloServidorArchivos(this, archi);
+            hiloArchi.start();
+        } else {
             JOptionPane.showMessageDialog(this, "Debes elegir un directorio para poder compartir.");
         }
     }//GEN-LAST:event_jBCompartCarpActionPerformed
@@ -324,21 +334,39 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     public void DatosUsuario() {
         jTADetalles1.setText(String.format("Nombre: %s\nDireccion: %s\nTlf: %s", user.getApellido(), user.getDireccion(), user.getTelefono()));
-        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s",socket.getInetAddress().toString(),user.getNombre()));
+        jTADetalles2.setText(String.format("Ip: %s\nUsuario: %s", socket.getInetAddress().toString(), user.getNombre()));
+        escribirLog(user.getNombre() + " logeado.");
     }
-    
-    public void setDos(DataOutputStream dos, Socket soc){
+
+    public void setDos(DataOutputStream dos, Socket soc) {
         this.dos = dos;
         this.socket = soc;
     }
-    
-    public void setOnBotonConectar(boolean isConectar){
+
+    public void setOnBotonConectar(boolean isConectar) {
         jBEsperarCliente.setEnabled(isConectar);
         jBEnviar.setEnabled(!isConectar);
         jBDesconectarCliente.setEnabled(!isConectar);
     }
-    
-    public void barraEstado(String stado){
+
+    public void barraEstado(String stado) {
         jLEstado.setText(stado);
+    }
+
+    public void escribirLog(String texto) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US);
+        String fecha = formatter.format(new Date(System.currentTimeMillis()));
+        File file = new File("Log.txt");
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+            PrintWriter pw = new PrintWriter(bw);
+            pw.println(fecha + "-->" + texto);
+            pw.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

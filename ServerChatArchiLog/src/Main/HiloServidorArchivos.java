@@ -10,41 +10,105 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
  *
  * @author Eros
  */
-public class HiloServidorArchivos extends Thread{
+public class HiloServidorArchivos extends Thread {
+    
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    private File file;
-
-    public HiloServidorArchivos(Socket socket, File file) {
-        this.socket = socket;
+    private FileInputStream fisleer;
+    private FileOutputStream fosescribir;
+    private Archivos file;
+    private VentanaServidor ven;
+    
+    public HiloServidorArchivos(VentanaServidor ven, Archivos file) {
         this.file = file;
+        this.ven = ven;
     }
+    
     @Override
     public void run() {
-        try{
-            FileOutputStream fos = null;
-        }catch(Exception ex){ex.printStackTrace();}
+        try {
+            ServerSocket server = new ServerSocket(VentanaServidor.NUM_PUERTO_FICH);
+            ven.barraEstado("Esperando que el cliente elija carpeta para compartir...");
+            socket = server.accept();
+            ven.barraEstado("Cliente conectado, enviando estructura...");
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            ois = new ObjectInputStream(socket.getInputStream());
+            oos.writeObject(file);
+            ven.escribirLog("Sincronizando carpeta " + file.getName());
+            oos.flush();
+            esperarRespuesta();
+            ven.escribirLog("Cliente actualizado");
+            ois.close();
+            oos.close();
+            socket.close();
+            server.close();
+            ven.barraEstado("Cliente sincronizado");
+        } catch (Exception ex) {
+            ven.barraEstado("Error Catastrófico.");
+            ex.printStackTrace();
+        }
     }
-    private void EnviarFichero(File fichero){
-        FileInputStream fis = null;
-        try{
-            fis = new FileInputStream(fichero);
-            long bytes = fichero.length();
-            byte[] buff = new byte[(int) bytes];
-            int i,j=0;
-            while((i=fis.read())!=-1){
-                buff[j]=(byte)i;
-                j++;
+    
+    private void esperarRespuesta() {
+        Integer resp;
+        try {
+            ven.barraEstado("Esperando respuesta");
+            while (true) {
+                resp = ois.readInt();
+                if (resp == 1) {
+                    ven.barraEstado("actualizando archivo en cliente");
+                    enviarArchivo((Archivos) ois.readObject());
+                } else if (resp == 2) {
+                    ven.barraEstado("actualizando archivo en servidor");
+                    recibirArchivo((Archivos) ois.readObject());
+                } else if (resp == 3) {
+                    break;
+                } else {
+                    ven.barraEstado("Solicitud desconocida");
+                    break;
+                }
             }
-            fis.close();
-            oos.writeObject(buff);
-        }catch(Exception ex){ex.printStackTrace();}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private void enviarArchivo(Archivos archivo) {
+        try {
+            File arch = new File(archivo.getAbsolutePath());
+            oos.writeObject(arch);
+            ven.escribirLog("Enviado " + arch.getName());
+            oos.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private void recibirArchivo(Archivos archivo) {
+        try {
+            File salida = new File(file.getAbsolutePath() + "\\" + archivo.getName());
+            salida.setLastModified(archivo.getLastModified());
+            File leido = (File) ois.readObject();
+            fisleer = new FileInputStream(leido);
+            fosescribir = new FileOutputStream(salida);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = fisleer.read(buffer)) > 0) {
+                fosescribir.write(buffer, 0, length);
+            }
+            ven.escribirLog("Recibido " + salida.getName());
+            fisleer.close();
+            fosescribir.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

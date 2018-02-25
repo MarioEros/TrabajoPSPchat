@@ -1,0 +1,40 @@
+25.02.18 13:15:52-->Servidor iniciado
+25.02.18 13:16:01-->Mario logeado.
+25.02.18 13:16:08-->Sincronizando carpeta A compart1
+25.02.18 13:16:13-->Enviado 45085.jpg
+25.02.18 13:16:16-->Enviado texto.txt
+25.02.18 13:16:16-->Cliente actualizado
+25.02.18 13:20:09-->Cliente desconectado
+25.02.18 13:20:09-->Servidor cerrado
+25.02.18 13:20:15-->Servidor iniciado
+25.02.18 13:20:24-->Mario logeado.
+25.02.18 13:20:31-->Sincronizando carpeta A compart1
+25.02.18 13:20:31-->Recibido 45085.jpg
+25.02.18 13:20:31-->Recibido texto.txt
+25.02.18 13:20:31-->Cliente actualizado
+25.02.18 13:23:19-->Cliente desconectado
+25.02.18 13:23:19-->Servidor cerrado
+25.02.18 13:23:51-->Servidor iniciado
+25.02.18 13:24:01-->Mario logeado.
+25.02.18 13:25:20-->Sincronizando carpeta A compart1
+25.02.18 13:25:20-->Enviado 45085.jpg
+25.02.18 13:25:20-->Enviado texto.txt
+25.02.18 13:25:20-->Cliente actualizado
+25.02.18 13:28:52-->Cliente desconectado
+25.02.18 13:28:52-->Servidor cerrado
+25.02.18 13:29:15-->Servidor iniciado
+25.02.18 13:29:22-->Mario logeado.
+25.02.18 13:29:28-->Sincronizando carpeta A compart1
+25.02.18 13:29:28-->Enviado 45085.jpg
+25.02.18 13:29:28-->Enviado texto.txt
+25.02.18 13:29:28-->Cliente actualizado
+25.02.18 13:29:43-->Cliente desconectado
+25.02.18 13:29:43-->Servidor cerrado
+25.02.18 13:30:57-->Servidor iniciado
+25.02.18 13:31:06-->Mario logeado.
+25.02.18 13:31:15-->Sincronizando carpeta A compart1
+25.02.18 13:31:15-->Recibido 45085.jpg
+25.02.18 13:31:15-->Recibido texto.txt
+25.02.18 13:31:15-->Cliente actualizado
+25.02.18 13:33:32-->Cliente desconectado
+25.02.18 13:33:32-->Servidor cerrado

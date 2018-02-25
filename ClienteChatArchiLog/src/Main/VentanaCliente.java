@@ -5,10 +5,17 @@
  */
 package Main;
 
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -22,10 +29,13 @@ public class VentanaCliente extends javax.swing.JFrame {
     DataOutputStream dos;
     String User;
     HiloClienteReceptor hiloRecep;
-    public static int NUM_PUERTO = 44444;
+    public static int NUM_PUERTO_MENS = 44444;
+    public static int NUM_PUERTO_FICH = 55555;
+    private Archivos archi;
 
     public VentanaCliente() {
         initComponents();
+        escribirLog("Cliente iniciado");
     }
 
     @SuppressWarnings("unchecked")
@@ -41,6 +51,8 @@ public class VentanaCliente extends javax.swing.JFrame {
         jLUsuario = new javax.swing.JLabel();
         jBConectar = new javax.swing.JButton();
         jBDesconectar = new javax.swing.JButton();
+        jLCarpCompartida = new javax.swing.JLabel();
+        jBCompartCarp = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -79,6 +91,16 @@ public class VentanaCliente extends javax.swing.JFrame {
             }
         });
 
+        jLCarpCompartida.setText("Ninguna carpeta compartida");
+        jLCarpCompartida.setEnabled(false);
+
+        jBCompartCarp.setText("Selec. Carpeta Compartida");
+        jBCompartCarp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBCompartCarpActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -87,7 +109,10 @@ public class VentanaCliente extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(8, 8, 8)
+                        .addComponent(jLCarpCompartida, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBCompartCarp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1)
@@ -105,16 +130,19 @@ public class VentanaCliente extends javax.swing.JFrame {
                         .addComponent(jTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jBEnviar)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jBCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jBConectar)
                     .addComponent(jBDesconectar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -124,6 +152,10 @@ public class VentanaCliente extends javax.swing.JFrame {
                     .addComponent(jTexto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBEnviar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLCarpCompartida, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBCompartCarp))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -137,6 +169,7 @@ public class VentanaCliente extends javax.swing.JFrame {
             dos.close();
             dis.close();
             socket.close();
+            escribirLog("Cliente cerrado");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,6 +185,7 @@ public class VentanaCliente extends javax.swing.JFrame {
             dos.writeUTF("*/QUIT*");
             socket.close();
             setOnBotonConectar(true);
+            escribirLog("Desconectado del servidor");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -167,6 +201,22 @@ public class VentanaCliente extends javax.swing.JFrame {
         }
         jTexto.setText("");
     }//GEN-LAST:event_jBEnviarActionPerformed
+
+    private void jBCompartCarpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCompartCarpActionPerformed
+        JFileChooser fileChoo = new JFileChooser();
+        fileChoo.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChoo.setDialogTitle("Selecciona la carpeta a compartir");
+        int returnVal = fileChoo.showDialog(fileChoo, "Seleccionar");
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            File ark = fileChoo.getSelectedFile();
+            archi = new Archivos(ark);
+            jLCarpCompartida.setText(archi.getName());
+            HiloClienteArchivos hiloArchi = new HiloClienteArchivos(this, archi);
+            hiloArchi.start();
+        }else{
+            JOptionPane.showMessageDialog(this, "Debes elegir un directorio para poder compartir.");
+        }
+    }//GEN-LAST:event_jBCompartCarpActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -203,9 +253,11 @@ public class VentanaCliente extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBCerrar;
+    private javax.swing.JButton jBCompartCarp;
     private javax.swing.JButton jBConectar;
     private javax.swing.JButton jBDesconectar;
     private javax.swing.JButton jBEnviar;
+    private javax.swing.JLabel jLCarpCompartida;
     private javax.swing.JLabel jLEstado;
     private javax.swing.JLabel jLUsuario;
     private javax.swing.JScrollPane jScrollPane1;
@@ -216,8 +268,8 @@ public class VentanaCliente extends javax.swing.JFrame {
     private void PedirCredenciales() {
         try {
             setOnBotonConectar(false);
-            socket = new Socket("127.0.0.1", NUM_PUERTO);
-            //new Socket(InetAddress.getByAddress("188.127.166.98", new byte[]{(byte)188,(byte)127,(byte)166,(byte)98}), NUM_PUERTO);
+            socket = new Socket("127.0.0.1", NUM_PUERTO_MENS);
+            //new Socket(InetAddress.getByAddress("188.127.166.98", new byte[]{(byte)188,(byte)127,(byte)166,(byte)98}), NUM_PUERTO_MENS);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
             String user = JOptionPane.showInputDialog(this, "Intoduzca Usuario", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
@@ -226,17 +278,20 @@ public class VentanaCliente extends javax.swing.JFrame {
                 dos.writeUTF(user + "##" + pass);
                 if (dis.readBoolean()) {
                     MensajesConsola("Logeado con el servidor!");
+                    escribirLog("logeado como "+user);
                     jBDesconectar.setEnabled(true);
                     User = user;
                     setOnBotonConectar(false);
                     ArrancarHilos();
                 } else {
                     MensajesConsola("Credenciales Erroneos");
+                    escribirLog("Login fallido");
                     setOnBotonConectar(true);
                 }
             } else {
                 dos.writeUTF("**NULL**" + "##" + "**NULL**");
                 MensajesConsola("Login cancelado.");
+                    escribirLog("Login cancelado");
                 setOnBotonConectar(true);
             }
         } catch (Exception ex) {
@@ -267,5 +322,34 @@ public class VentanaCliente extends javax.swing.JFrame {
     
     public void barraEstado(String stado){
         jLEstado.setText(stado);
+    }
+    
+    public void appendLog(String texto) {
+        File archi = new File("Log.txt");
+        try {
+            if (!archi.exists())archi.createNewFile();
+            FileWriter fw = new FileWriter(archi);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.append(texto);
+            bw.newLine();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    public void escribirLog(String texto) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US);
+        String fecha = formatter.format(new Date(System.currentTimeMillis()));
+        File file = new File("Log.txt");
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file,true));
+            PrintWriter pw = new PrintWriter(bw);
+            pw.println(fecha + "-->" + texto);
+            pw.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

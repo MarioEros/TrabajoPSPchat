@@ -1,0 +1,40 @@
+25.02.18 13:15:55-->Cliente iniciado
+25.02.18 13:16:01-->logeado como Mario
+25.02.18 13:16:08-->Sincronizando archivos
+25.02.18 13:16:13-->Recibido 45085.jpg
+25.02.18 13:16:16-->Recibido texto.txt
+25.02.18 13:16:16-->Archivos actualizados
+25.02.18 13:20:09-->Desconectado del servidor
+25.02.18 13:20:10-->Cliente cerrado
+25.02.18 13:20:18-->Cliente iniciado
+25.02.18 13:20:24-->logeado como Mario
+25.02.18 13:20:31-->Sincronizando archivos
+25.02.18 13:20:31-->Enviado 45085.jpg
+25.02.18 13:20:31-->Enviado texto.txt
+25.02.18 13:20:31-->Archivos actualizados
+25.02.18 13:23:19-->Desconectado del servidor
+25.02.18 13:23:21-->Cliente cerrado
+25.02.18 13:23:52-->Cliente iniciado
+25.02.18 13:24:01-->logeado como Mario
+25.02.18 13:25:20-->Sincronizando archivos
+25.02.18 13:25:20-->Recibido 45085.jpg
+25.02.18 13:25:20-->Recibido texto.txt
+25.02.18 13:25:20-->Archivos actualizados
+25.02.18 13:28:52-->Desconectado del servidor
+25.02.18 13:28:53-->Cliente cerrado
+25.02.18 13:29:17-->Cliente iniciado
+25.02.18 13:29:22-->logeado como Mario
+25.02.18 13:29:28-->Sincronizando archivos
+25.02.18 13:29:28-->Recibido 45085.jpg
+25.02.18 13:29:28-->Recibido texto.txt
+25.02.18 13:29:28-->Archivos actualizados
+25.02.18 13:29:43-->Desconectado del servidor
+25.02.18 13:29:43-->Cliente cerrado
+25.02.18 13:30:59-->Cliente iniciado
+25.02.18 13:31:06-->logeado como Mario
+25.02.18 13:31:15-->Sincronizando archivos
+25.02.18 13:31:15-->Enviado 45085.jpg
+25.02.18 13:31:15-->Enviado texto.txt
+25.02.18 13:31:15-->Archivos actualizados
+25.02.18 13:33:32-->Desconectado del servidor
+25.02.18 13:33:34-->Cliente cerrado
