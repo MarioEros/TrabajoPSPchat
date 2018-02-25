@@ -58,6 +58,7 @@ public class HiloClienteArchivos extends Thread {
         ven.barraEstado("Actualizando " + totalArchivos + " archivos.");
         ArrayList<Archivos> archivosServer = archis;
         ArrayList<Archivos> archivosPropios = file.getArchivos();
+        //Si la carpeta contiene archivos comprobamos uno a uno
         if (!archivosServer.isEmpty()) {
             archivosServer.forEach(a -> {
                 if (archivosPropios.contains(a)) {
@@ -109,6 +110,7 @@ public class HiloClienteArchivos extends Thread {
     }
 
     private void enviarArchivo(Archivos archivo) {
+        //Enviamos el File que corresponde a al Archivo correspondiente
         try {
             oos.writeObject(archivo);
             oos.flush();
@@ -122,6 +124,7 @@ public class HiloClienteArchivos extends Thread {
     }
 
     private void recibirArchivo(Archivos archivo) {
+        //Creamos File correspondiente a al Archivo y recibimos el File.
         try {
             oos.writeObject(archivo);
             oos.flush();

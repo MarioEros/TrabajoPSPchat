@@ -35,12 +35,14 @@ public class HiloServidorArchivos extends Thread {
     @Override
     public void run() {
         try {
+            //Creamos el socket y los Streams
             ServerSocket server = new ServerSocket(VentanaServidor.NUM_PUERTO_FICH);
             ven.barraEstado("Esperando que el cliente elija carpeta para compartir...");
             socket = server.accept();
             ven.barraEstado("Cliente conectado, enviando estructura...");
             oos = new ObjectOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket.getInputStream());
+            //Enviamos el contenido de la carpeta
             oos.writeObject(file);
             ven.escribirLog("Sincronizando carpeta " + file.getName());
             oos.flush();
@@ -62,6 +64,7 @@ public class HiloServidorArchivos extends Thread {
         try {
             ven.barraEstado("Esperando respuesta");
             while (true) {
+                //Recibimos la peticion
                 resp = ois.readInt();
                 if (resp == 1) {
                     ven.barraEstado("actualizando archivo en cliente");
@@ -82,6 +85,7 @@ public class HiloServidorArchivos extends Thread {
     }
     
     private void enviarArchivo(Archivos archivo) {
+        //Enviamos el File que corresponde a al Archivo correspondiente
         try {
             File arch = new File(archivo.getAbsolutePath());
             oos.writeObject(arch);
@@ -93,6 +97,7 @@ public class HiloServidorArchivos extends Thread {
     }
     
     private void recibirArchivo(Archivos archivo) {
+        //Creamos File correspondiente a al Archivo y recibimos el File.
         try {
             File salida = new File(file.getAbsolutePath() + "\\" + archivo.getName());
             salida.setLastModified(archivo.getLastModified());
