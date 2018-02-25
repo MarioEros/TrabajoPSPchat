@@ -9,6 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import javax.crypto.Cipher;
 
 /**
  *
@@ -22,13 +23,15 @@ public class HiloServidorReceptor extends Thread {
     private ServerSocket servidor;
     private VentanaServidor ven;
     private BaseDeDatosCutre db;
+    private Cipher desencrip;
     public Usuario usuario;
 
-    public HiloServidorReceptor(VentanaServidor ven, Socket socket, ServerSocket servidor) {
+    public HiloServidorReceptor(VentanaServidor ven, Socket socket, ServerSocket servidor,Cipher desencrip) {
         this.socket = socket;
         this.servidor = servidor;
         this.ven = ven;
         this.db = new BaseDeDatosCutre();
+        this.desencrip=desencrip;
     }
 
     @Override
@@ -60,6 +63,9 @@ public class HiloServidorReceptor extends Thread {
     private void LeerMensajes() {
         while (true) {
             try {
+                //byte[] texto = new byte[1024];
+                //dis.read(texto);
+                //String mens = new String(desencrip.doFinal(texto));
                 String mens = dis.readUTF();
                 if (mens.equals("*/QUIT*")) {
                     ven.MensajesConsola("Sesion desconectada por el Cliente.");
@@ -70,7 +76,7 @@ public class HiloServidorReceptor extends Thread {
                 } else {
                     ven.EscribirEnChat(mens, false);
                 }
-            } catch (Exception ex) {
+            }  catch (Exception ex) {
                 ex.printStackTrace();
                 break;
             }

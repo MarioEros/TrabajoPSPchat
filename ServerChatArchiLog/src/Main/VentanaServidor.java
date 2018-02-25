@@ -8,13 +8,19 @@ package Main;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -32,8 +38,10 @@ public class VentanaServidor extends javax.swing.JFrame {
     private HiloServidorReceptor hiloRecep;
     private Usuario user;
     private DataOutputStream dos;
+    private ObjectOutputStream oos;
     private Archivos archi;
-    private Date fecha;
+    private Cipher encrip;
+    private Cipher desencrip;
 
     public VentanaServidor() {
         initComponents();
@@ -44,6 +52,7 @@ public class VentanaServidor extends javax.swing.JFrame {
         } catch (Exception ex) {
             MensajesConsola("Error al iniciar el Servidor.");
         }
+        obtenerClave();
     }
 
     /**
@@ -228,6 +237,7 @@ public class VentanaServidor extends javax.swing.JFrame {
         String texto = jTexto.getText();
         EscribirEnChat(texto, true);
         try {
+            //dos.write(encrip.doFinal(texto.getBytes()));
             dos.writeUTF(texto);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -307,7 +317,7 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     private void IniciarConexion() {
         setOnBotonConectar(false);
-        hiloRecep = new HiloServidorReceptor(this, socket, servidor);
+        hiloRecep = new HiloServidorReceptor(this, socket, servidor,desencrip);
         hiloRecep.start();
     }
 
@@ -366,6 +376,28 @@ public class VentanaServidor extends javax.swing.JFrame {
             pw.println(fecha + "-->" + texto);
             pw.flush();
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private void obtenerClave() {
+        File archivoClave = new File("clave.key");
+        if (!archivoClave.exists()) {
+            GeneradorClave.generarClave();
+            escribirLog("Clave generada");
+        }
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivoClave));
+            Key clave = (Key)ois.readObject();
+            encrip = Cipher.getInstance("AES/CBC/NoPadding");
+            desencrip = Cipher.getInstance("AES/CBC/NoPadding");
+            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            IvParameterSpec ivspec = new IvParameterSpec(iv);
+            encrip.init(Cipher.ENCRYPT_MODE, clave,ivspec);
+            desencrip.init(Cipher.DECRYPT_MODE, clave,ivspec);
+            escribirLog("Clave cargada");
+        } catch (Exception ex) {
+            EscribirEnChat("Error al cargar claves", true);
             ex.printStackTrace();
         }
     }

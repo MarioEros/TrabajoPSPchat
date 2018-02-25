@@ -38,3 +38,21 @@
 25.02.18 13:31:15-->Archivos actualizados
 25.02.18 13:33:32-->Desconectado del servidor
 25.02.18 13:33:34-->Cliente cerrado
+25.02.18 15:16:00-->Cliente iniciado
+25.02.18 15:16:01-->Clave cargada
+25.02.18 15:16:09-->logeado como Mario
+25.02.18 15:16:40-->Cliente cerrado
+25.02.18 15:22:24-->Cliente iniciado
+25.02.18 15:25:12-->Cliente iniciado
+25.02.18 15:25:13-->Clave cargada
+25.02.18 15:25:19-->logeado como Mario
+25.02.18 15:25:48-->Cliente cerrado
+25.02.18 15:25:54-->Cliente iniciado
+25.02.18 15:25:54-->Clave cargada
+25.02.18 15:25:59-->logeado como Mario
+25.02.18 15:27:03-->Cliente cerrado
+25.02.18 15:28:54-->Cliente iniciado
+25.02.18 15:28:54-->Clave cargada
+25.02.18 15:28:58-->logeado como Mario
+25.02.18 15:29:09-->Desconectado del servidor
+25.02.18 15:29:09-->Cliente cerrado

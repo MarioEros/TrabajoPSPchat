@@ -9,12 +9,18 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -27,15 +33,19 @@ public class VentanaCliente extends javax.swing.JFrame {
     Socket socket;
     DataInputStream dis;
     DataOutputStream dos;
+    private ObjectOutputStream oos;
     String User;
     HiloClienteReceptor hiloRecep;
     public static int NUM_PUERTO_MENS = 44444;
     public static int NUM_PUERTO_FICH = 55555;
     private Archivos archi;
+    private Cipher encrip;
+    private Cipher desencrip;
 
     public VentanaCliente() {
         initComponents();
         escribirLog("Cliente iniciado");
+        obtenerClave();
     }
 
     @SuppressWarnings("unchecked")
@@ -195,6 +205,7 @@ public class VentanaCliente extends javax.swing.JFrame {
         String texto = jTexto.getText();
         EscribirEnChat(texto, false);
         try {
+            //dos.write(encrip.doFinal(texto.getBytes()));
             dos.writeUTF(texto);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -302,7 +313,7 @@ public class VentanaCliente extends javax.swing.JFrame {
     }
 
     private void ArrancarHilos() {
-        hiloRecep = new HiloClienteReceptor(this, socket, dis);
+        hiloRecep = new HiloClienteReceptor(this, socket, dis,desencrip);
         hiloRecep.start();
     }
 
@@ -349,6 +360,23 @@ public class VentanaCliente extends javax.swing.JFrame {
             pw.println(fecha + "-->" + texto);
             pw.flush();
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    private void obtenerClave() {
+        File archivoClave = new File("clave.key");
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivoClave));
+            Key clave = (Key)ois.readObject();
+            encrip = Cipher.getInstance("AES/CBC/NoPadding");
+            desencrip = Cipher.getInstance("AES/CBC/NoPadding");
+            byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            IvParameterSpec ivspec = new IvParameterSpec(iv);
+            encrip.init(Cipher.ENCRYPT_MODE, clave,ivspec);
+            desencrip.init(Cipher.DECRYPT_MODE, clave,ivspec);
+            escribirLog("Clave cargada");
+        } catch (Exception ex) {
+            EscribirEnChat("Error al cargar claves", true);
             ex.printStackTrace();
         }
     }
