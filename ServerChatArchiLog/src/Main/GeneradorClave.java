@@ -5,6 +5,7 @@
  */
 package Main;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import javax.crypto.KeyGenerator;
@@ -20,7 +21,9 @@ public class GeneradorClave {
             KeyGenerator kg = KeyGenerator.getInstance("AES");
             kg.init(128);
             SecretKey clave = kg.generateKey();
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("clave.key"));
+            File archivo = new File("Clave");
+            if(!archivo.exists())archivo.mkdir();
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Clave\\clave.key"));
             oos.writeObject(clave);
             oos.flush();
             oos.close();

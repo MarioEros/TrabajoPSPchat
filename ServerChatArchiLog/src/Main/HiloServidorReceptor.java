@@ -9,6 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Base64;
 import javax.crypto.Cipher;
 
 /**
@@ -63,18 +64,16 @@ public class HiloServidorReceptor extends Thread {
     private void LeerMensajes() {
         while (true) {
             try {
-                //byte[] texto = new byte[1024];
-                //dis.read(texto);
-                //String mens = new String(desencrip.doFinal(texto));
-                String mens = dis.readUTF();
-                if (mens.equals("*/QUIT*")) {
+                String mensaje = new String(desencrip.doFinal(Base64.getDecoder().decode(dis.readUTF())));
+                if (mensaje.equals("*/QUIT*")) {
                     ven.MensajesConsola("Sesion desconectada por el Cliente.");
                     ven.escribirLog("Cliente desconectado.");
                     ven.TerminarConexion();
                     ven.setOnBotonConectar(true);
+                    dis.close();
                     break;
                 } else {
-                    ven.EscribirEnChat(mens, false);
+                    ven.EscribirEnChat(mensaje, false);
                 }
             }  catch (Exception ex) {
                 ex.printStackTrace();
@@ -86,7 +85,7 @@ public class HiloServidorReceptor extends Thread {
     //@return Verdadero o falso dependiendo del si son correctos los credenciales.
     private boolean validar() {
         try {
-            String leido = dis.readUTF();
+            String leido = new String(desencrip.doFinal(Base64.getDecoder().decode(dis.readUTF())));
             String[] log = leido.split("##");
             if (db.containsKey(log[0]) && db.get(log[0]).getContrasenna().equals(log[1])) {
                 dos.writeBoolean(true);

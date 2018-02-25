@@ -17,10 +17,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.Key;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -175,7 +175,7 @@ public class VentanaCliente extends javax.swing.JFrame {
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
         try {
-            dos.writeUTF("*/QUIT*");
+            enviarMensajeAServidor("*/QUIT*");
             dos.close();
             dis.close();
             socket.close();
@@ -192,7 +192,7 @@ public class VentanaCliente extends javax.swing.JFrame {
 
     private void jBDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarActionPerformed
         try {
-            dos.writeUTF("*/QUIT*");
+            enviarMensajeAServidor("*/QUIT*");
             socket.close();
             setOnBotonConectar(true);
             escribirLog("Desconectado del servidor");
@@ -205,8 +205,7 @@ public class VentanaCliente extends javax.swing.JFrame {
         String texto = jTexto.getText();
         EscribirEnChat(texto, false);
         try {
-            //dos.write(encrip.doFinal(texto.getBytes()));
-            dos.writeUTF(texto);
+            enviarMensajeAServidor(texto);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -286,7 +285,7 @@ public class VentanaCliente extends javax.swing.JFrame {
             String user = JOptionPane.showInputDialog(this, "Intoduzca Usuario", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
             String pass = JOptionPane.showInputDialog(this, "Intoduzca Contraseña", "Credenciales", JOptionPane.INFORMATION_MESSAGE);
             if (user != null && pass != null) {
-                dos.writeUTF(user + "##" + pass);
+                enviarMensajeAServidor(user + "##" + pass);
                 if (dis.readBoolean()) {
                     MensajesConsola("Logeado con el servidor!");
                     escribirLog("logeado como "+user);
@@ -300,14 +299,14 @@ public class VentanaCliente extends javax.swing.JFrame {
                     setOnBotonConectar(true);
                 }
             } else {
-                dos.writeUTF("**NULL**" + "##" + "**NULL**");
+                enviarMensajeAServidor("**NULL**" + "##" + "**NULL**");
                 MensajesConsola("Login cancelado.");
                     escribirLog("Login cancelado");
                 setOnBotonConectar(true);
             }
         } catch (Exception ex) {
-            MensajesConsola("Error Fatal al intentar conectar.");
-            jBConectar.setEnabled(true);
+            MensajesConsola("Error al intentar conectar. ¿Esta el servidor online?");
+            setOnBotonConectar(true);
             ex.printStackTrace();
         }
     }
@@ -364,7 +363,10 @@ public class VentanaCliente extends javax.swing.JFrame {
         }
     }
     private void obtenerClave() {
-        File archivoClave = new File("clave.key");
+        File archivo = new File("Clave");
+        if(!archivo.exists())archivo.mkdir();
+        File archivoClave = new File("Clave\\clave.key");
+        if(archivoClave.exists()){
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivoClave));
             Key clave = (Key)ois.readObject();
@@ -376,6 +378,15 @@ public class VentanaCliente extends javax.swing.JFrame {
         } catch (Exception ex) {
             EscribirEnChat("Error al cargar claves", true);
             ex.printStackTrace();
+        }
+        }else EscribirEnChat("Faltan claves de encriptación, descaguelas en \\Claves y reinicie el cliente", true);
+    }
+    private void enviarMensajeAServidor(String texto){
+        try{
+            dos.writeUTF(Base64.getEncoder().encodeToString(encrip.doFinal(texto.getBytes())));
+            dos.flush();
+        }catch(Exception ex){
+            System.out.println("Error al enviar mensaje");
         }
     }
 }

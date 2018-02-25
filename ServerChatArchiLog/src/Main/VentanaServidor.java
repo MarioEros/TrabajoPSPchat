@@ -11,16 +11,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.Key;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -38,7 +37,6 @@ public class VentanaServidor extends javax.swing.JFrame {
     private HiloServidorReceptor hiloRecep;
     private Usuario user;
     private DataOutputStream dos;
-    private ObjectOutputStream oos;
     private Archivos archi;
     private Cipher encrip;
     private Cipher desencrip;
@@ -203,7 +201,7 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
         try {
-            dos.writeUTF("*/QUIT*");
+            enviarMensajeACliente("*/QUIT*");
             hiloRecep.interrupt();
             dos.close();
             socket.close();
@@ -221,13 +219,13 @@ public class VentanaServidor extends javax.swing.JFrame {
 
     private void jBDesconectarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarClienteActionPerformed
         try {
-            dos.writeUTF("*/QUIT*");
+            enviarMensajeACliente("*/QUIT*");
             hiloRecep.interrupt();
             dos.close();
             socket.close();
             MensajesConsola("Cliente expulsado por el servidor");
         } catch (Exception e) {
-            MensajesConsola("Cliente expulsado por el servidor");
+            MensajesConsola("Conexion cancelada");
         }
         escribirLog("Cliente desconectado");
         setOnBotonConectar(true);
@@ -237,8 +235,7 @@ public class VentanaServidor extends javax.swing.JFrame {
         String texto = jTexto.getText();
         EscribirEnChat(texto, true);
         try {
-            //dos.write(encrip.doFinal(texto.getBytes()));
-            dos.writeUTF(texto);
+            enviarMensajeACliente(texto);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -324,6 +321,7 @@ public class VentanaServidor extends javax.swing.JFrame {
     public void TerminarConexion() {
         hiloRecep.interrupt();
         try {
+            dos.close();
             socket.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -381,7 +379,7 @@ public class VentanaServidor extends javax.swing.JFrame {
     }
     
     private void obtenerClave() {
-        File archivoClave = new File("clave.key");
+        File archivoClave = new File("Clave\\clave.key");
         if (!archivoClave.exists()) {
             GeneradorClave.generarClave();
             escribirLog("Clave generada");
@@ -397,6 +395,14 @@ public class VentanaServidor extends javax.swing.JFrame {
         } catch (Exception ex) {
             EscribirEnChat("Error al cargar claves", true);
             ex.printStackTrace();
+        }
+    }
+    private void enviarMensajeACliente(String texto){
+        try{
+            dos.writeUTF(Base64.getEncoder().encodeToString(encrip.doFinal(texto.getBytes())));
+            dos.flush();
+        }catch(Exception ex){
+            System.out.println("Error al enviar mensaje");
         }
     }
 }
