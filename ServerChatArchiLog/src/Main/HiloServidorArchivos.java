@@ -18,7 +18,7 @@ import java.net.Socket;
  * @author Eros
  */
 public class HiloServidorArchivos extends Thread {
-    
+
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
@@ -26,12 +26,12 @@ public class HiloServidorArchivos extends Thread {
     private FileOutputStream fosescribir;
     private Archivos file;
     private VentanaServidor ven;
-    
+
     public HiloServidorArchivos(VentanaServidor ven, Archivos file) {
         this.file = file;
         this.ven = ven;
     }
-    
+
     @Override
     public void run() {
         try {
@@ -52,15 +52,15 @@ public class HiloServidorArchivos extends Thread {
             oos.close();
             socket.close();
             server.close();
-            ven.barraEstado("Cliente sincronizado");
         } catch (Exception ex) {
             ven.barraEstado("Error Catastrófico.");
             ex.printStackTrace();
         }
     }
-    
+
     private void esperarRespuesta() {
         Integer resp;
+        int recib=0,envi=0;
         try {
             ven.barraEstado("Esperando respuesta");
             while (true) {
@@ -69,9 +69,11 @@ public class HiloServidorArchivos extends Thread {
                 if (resp == 1) {
                     ven.barraEstado("actualizando archivo en cliente");
                     enviarArchivo((Archivos) ois.readObject());
+                    envi++;
                 } else if (resp == 2) {
                     ven.barraEstado("actualizando archivo en servidor");
                     recibirArchivo((Archivos) ois.readObject());
+                    recib++;
                 } else if (resp == 3) {
                     break;
                 } else {
@@ -79,11 +81,15 @@ public class HiloServidorArchivos extends Thread {
                     break;
                 }
             }
+            if(recib==0&&envi==0)
+            ven.barraEstado("El cliente está actualizado");
+            else
+                ven.barraEstado(recib+" archivo/s recibidos, "+envi+" archivos enviado/s.");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void enviarArchivo(Archivos archivo) {
         //Enviamos el File que corresponde a al Archivo correspondiente
         try {
@@ -95,12 +101,12 @@ public class HiloServidorArchivos extends Thread {
             ex.printStackTrace();
         }
     }
-    
+
     private void recibirArchivo(Archivos archivo) {
+
         //Creamos File correspondiente a al Archivo y recibimos el File.
         try {
             File salida = new File(file.getAbsolutePath() + "\\" + archivo.getName());
-            salida.setLastModified(archivo.getLastModified());
             File leido = (File) ois.readObject();
             fisleer = new FileInputStream(leido);
             fosescribir = new FileOutputStream(salida);
@@ -112,6 +118,7 @@ public class HiloServidorArchivos extends Thread {
             ven.escribirLog("Recibido " + salida.getName());
             fisleer.close();
             fosescribir.close();
+            salida.setLastModified(leido.lastModified());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

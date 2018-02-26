@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.Key;
@@ -33,7 +32,6 @@ public class VentanaCliente extends javax.swing.JFrame {
     Socket socket;
     DataInputStream dis;
     DataOutputStream dos;
-    private ObjectOutputStream oos;
     String User;
     HiloClienteReceptor hiloRecep;
     public static int NUM_PUERTO_MENS = 44444;
@@ -379,7 +377,7 @@ public class VentanaCliente extends javax.swing.JFrame {
             EscribirEnChat("Error al cargar claves", true);
             ex.printStackTrace();
         }
-        }else EscribirEnChat("Faltan claves de encriptación, descaguelas en \\Claves y reinicie el cliente", true);
+        }else EscribirEnChat("Faltan claves de encriptación, descaguelas o copielas manualmente\n en \\Claves y reinicie el cliente (desde la misma ubicación en el servidor)", true);
     }
     private void enviarMensajeAServidor(String texto){
         try{

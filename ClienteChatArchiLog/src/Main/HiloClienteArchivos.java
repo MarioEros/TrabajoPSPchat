@@ -23,6 +23,8 @@ public class HiloClienteArchivos extends Thread {
     private FileOutputStream fosescribir;
     private VentanaCliente ven;
     private Archivos file;
+    private int envi;
+    private int recib;
 
     public HiloClienteArchivos(VentanaCliente ven, Archivos file) {
         this.file = file;
@@ -38,14 +40,14 @@ public class HiloClienteArchivos extends Thread {
             oos = new ObjectOutputStream(socket.getOutputStream());
             ven.barraEstado("Esperando Estructura...");
             Archivos nuevo = (Archivos) ois.readObject();
-            ven.escribirLog("Sincronizando archivos");
+            ven.escribirLog("Sincronizando archivos desde "+nuevo.getName());
             ven.barraEstado(nuevo.getName());
             ArrayList<Archivos> archis = nuevo.getArchivos();
             comprobarArchivos(archis);
-            ven.escribirLog("Archivos actualizados");
             ois.close();
             oos.close();
             socket.close();
+            ven.escribirLog("Archivos sincronizados");
         } catch (Exception ex) {
             ven.barraEstado("Error en la transmision de archivos");
             ex.printStackTrace();
@@ -53,6 +55,9 @@ public class HiloClienteArchivos extends Thread {
     }
 
     private void comprobarArchivos(ArrayList<Archivos> archis) {
+        envi=0;
+        recib=0;
+        int borrados=0;
         int totalArchivos = archis.size();
         ven.barraEstado("Actualizando " + totalArchivos + " archivos.");
         ArrayList<Archivos> archivosServer = archis;
@@ -102,10 +107,13 @@ public class HiloClienteArchivos extends Thread {
                     File quitar = new File(archivosPropios.get(i).getAbsolutePath());
                     ven.escribirLog(quitar.getName() + " Eliminado");
                     quitar.delete();
+                    borrados++;
                 }
             }
-        }
-        ven.barraEstado("Todos los archivos sincronizados");
+        }if(recib==0&&envi==0)
+            ven.barraEstado("Los archivos están actualizados. "+(borrados==0?"": borrados+" archivo/s borrados."));
+            else
+                ven.barraEstado(recib+" archivo/s recibidos, "+envi+" archivos enviado/s. "+(borrados==0?"": borrados+" archivo/s borrados."));
     }
 
     private void enviarArchivo(Archivos archivo) {
@@ -117,18 +125,19 @@ public class HiloClienteArchivos extends Thread {
             oos.writeObject(arch);
             ven.escribirLog("Enviado " + arch.getName());
             oos.flush();
+            envi++;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     private void recibirArchivo(Archivos archivo) {
+        
         //Creamos File correspondiente a al Archivo y recibimos el File.
         try {
             oos.writeObject(archivo);
             oos.flush();
             File salida = new File(file.getAbsolutePath() + "\\" + archivo.getName());
-            salida.setLastModified(archivo.getLastModified());
             File leido = (File) ois.readObject();
             fisleer = new FileInputStream(leido);
             fosescribir = new FileOutputStream(salida);
@@ -140,6 +149,8 @@ public class HiloClienteArchivos extends Thread {
             ven.escribirLog("Recibido " + salida.getName());
             fisleer.close();
             fosescribir.close();
+            salida.setLastModified(leido.lastModified());
+            recib++;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
