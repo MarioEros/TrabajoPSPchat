@@ -6,10 +6,10 @@
 package Main;
 
 /**
- *
- * @author Eros
+ * @author Eros Clase usuario para la base de datos y las comprobaciones
  */
 public class Usuario {
+
     private String Contrasenna;
     private String Nombre;
     private String Apellido;
@@ -43,5 +43,5 @@ public class Usuario {
     public String getTelefono() {
         return Telefono;
     }
-    
+
 }

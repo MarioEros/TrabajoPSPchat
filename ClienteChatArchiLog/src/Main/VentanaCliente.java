@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
  */
 public class VentanaCliente extends javax.swing.JFrame {
 
+    //Inicio todas las variables
     Socket socket;
     DataInputStream dis;
     DataOutputStream dos;
@@ -36,7 +37,9 @@ public class VentanaCliente extends javax.swing.JFrame {
     HiloClienteReceptor hiloRecep;
     public static int NUM_PUERTO_MENS = 44444;
     public static int NUM_PUERTO_FICH = 55555;
+    //Esta es mi clase para enviar la estructura de ficheros.
     private Archivos archi;
+    //Estos son los Objetos para encriptar y desencriptar
     private Cipher encrip;
     private Cipher desencrip;
 
@@ -172,6 +175,7 @@ public class VentanaCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCerrarActionPerformed
+        //Enviamos el cierre, cerramos los sockets y cerramos la app
         try {
             enviarMensajeAServidor("*/QUIT*");
             dos.close();
@@ -189,6 +193,7 @@ public class VentanaCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jBConectarActionPerformed
 
     private void jBDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBDesconectarActionPerformed
+        //Enviamos el cierre y cerramos el socket y habilitamos los botones
         try {
             enviarMensajeAServidor("*/QUIT*");
             socket.close();
@@ -200,6 +205,9 @@ public class VentanaCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jBDesconectarActionPerformed
 
     private void jBEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEnviarActionPerformed
+        //Leemos el texto del jTexto, lo escribimos en el chat
+        //y se lo pasamos al metodo enviar
+        //tambien vaciamos el Jtexto
         String texto = jTexto.getText();
         EscribirEnChat(texto, false);
         try {
@@ -211,17 +219,20 @@ public class VentanaCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jBEnviarActionPerformed
 
     private void jBCompartCarpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCompartCarpActionPerformed
+        //Lanzamos un JFileChooser y hacemos que solo muestre carpetas
         JFileChooser fileChoo = new JFileChooser();
         fileChoo.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fileChoo.setDialogTitle("Selecciona la carpeta a compartir");
         int returnVal = fileChoo.showDialog(fileChoo, "Seleccionar");
-        if (returnVal == JFileChooser.APPROVE_OPTION){
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            //Cuando el usuario selecciona un archivo, lo convierte en la clase Archivos
+            //iniciamos el hilo al que le pasamos la estructura de ficheros y la ventana
             File ark = fileChoo.getSelectedFile();
             archi = new Archivos(ark);
             jLCarpCompartida.setText(archi.getName());
             HiloClienteArchivos hiloArchi = new HiloClienteArchivos(this, archi);
             hiloArchi.start();
-        }else{
+        } else {
             JOptionPane.showMessageDialog(this, "Debes elegir un directorio para poder compartir.");
         }
     }//GEN-LAST:event_jBCompartCarpActionPerformed
@@ -273,6 +284,12 @@ public class VentanaCliente extends javax.swing.JFrame {
     private javax.swing.JTextField jTexto;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * En este metodo realizo la conexion y envio el resultado de los 2 Joption
+     * en una sola cadena luego lee la respuesta del servidor que será un true,
+     * si se validó y false en caso contrario si la validación es correcta, se
+     * inicia el hiloReceptor
+     */
     private void PedirCredenciales() {
         try {
             setOnBotonConectar(false);
@@ -286,7 +303,7 @@ public class VentanaCliente extends javax.swing.JFrame {
                 enviarMensajeAServidor(user + "##" + pass);
                 if (dis.readBoolean()) {
                     MensajesConsola("Logeado con el servidor!");
-                    escribirLog("logeado como "+user);
+                    escribirLog("logeado como " + user);
                     jBDesconectar.setEnabled(true);
                     User = user;
                     setOnBotonConectar(false);
@@ -299,7 +316,7 @@ public class VentanaCliente extends javax.swing.JFrame {
             } else {
                 enviarMensajeAServidor("**NULL**" + "##" + "**NULL**");
                 MensajesConsola("Login cancelado.");
-                    escribirLog("Login cancelado");
+                escribirLog("Login cancelado");
                 setOnBotonConectar(true);
             }
         } catch (Exception ex) {
@@ -309,33 +326,62 @@ public class VentanaCliente extends javax.swing.JFrame {
         }
     }
 
+    //Arranco el HiloClienteReceptor pasandole el socket,
+    //el DataInputStream y el Cipher para desencriptar
     private void ArrancarHilos() {
-        hiloRecep = new HiloClienteReceptor(this, socket, dis,desencrip);
+        hiloRecep = new HiloClienteReceptor(this, socket, dis, desencrip);
         hiloRecep.start();
     }
 
+    /**
+     * Metodo que escribe en la ventana de chat
+     *
+     * @param texto el mensaje a escribir
+     * @param isServer un boolean que indica si es el servidor o el cliente
+     */
     public void EscribirEnChat(String texto, boolean isServer) {
         jTAChat.append((isServer ? "Servidor: " : User + ": ") + texto + "\n");
     }
 
+    /**
+     * Metodo que añade texto al chat sin que aparezca server o cliente
+     *
+     * @param texto el menjase a escribir
+     */
     public void MensajesConsola(String texto) {
         jTAChat.append(texto + "\n");
     }
 
+    /**
+     * Un metodo que habilita y deshabilita los botones de conexion y enviar
+     *
+     * @param isConectar el boolean que dice si sí o no
+     */
     public void setOnBotonConectar(boolean isConectar) {
         jBConectar.setEnabled(isConectar);
         jBEnviar.setEnabled(!isConectar);
         jBDesconectar.setEnabled(!isConectar);
     }
-    
-    public void barraEstado(String stado){
+
+    /**
+     * Metodo que escribe en la barra de estado de archivos
+     *
+     * @param stado el mensaje a escrbir
+     */
+    public void barraEstado(String stado) {
         jLEstado.setText(stado);
     }
-    
+
+    /**
+     * Este metodo fue una primera version del log y no la uso para nada, se me
+     * olvidó borrarla
+     */
     public void appendLog(String texto) {
         File archi = new File("Log.txt");
         try {
-            if (!archi.exists())archi.createNewFile();
+            if (!archi.exists()) {
+                archi.createNewFile();
+            }
             FileWriter fw = new FileWriter(archi);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.append(texto);
@@ -344,6 +390,12 @@ public class VentanaCliente extends javax.swing.JFrame {
             ex.printStackTrace();
         }
     }
+
+    /**
+     * Metodo que escribe en el log
+     *
+     * @param texto el texto a escribir
+     */
     public void escribirLog(String texto) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy HH:mm:ss", Locale.US);
         String fecha = formatter.format(new Date(System.currentTimeMillis()));
@@ -352,7 +404,7 @@ public class VentanaCliente extends javax.swing.JFrame {
             if (!file.exists()) {
                 file.createNewFile();
             }
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file,true));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
             PrintWriter pw = new PrintWriter(bw);
             pw.println(fecha + "-->" + texto);
             pw.flush();
@@ -360,30 +412,54 @@ public class VentanaCliente extends javax.swing.JFrame {
             ex.printStackTrace();
         }
     }
+
+    /**
+     * Obtiene la clave del fichero clave.key y la carga en los Cipher si no la
+     * tiene envia un aviso para copiar la clave o descargarla(ya no, antes si
+     * porque la validación iva sin encriptar.)
+     */
     private void obtenerClave() {
         File archivo = new File("Clave");
-        if(!archivo.exists())archivo.mkdir();
-        File archivoClave = new File("Clave\\clave.key");
-        if(archivoClave.exists()){
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivoClave));
-            Key clave = (Key)ois.readObject();
-            encrip = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            desencrip = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            encrip.init(Cipher.ENCRYPT_MODE, clave);
-            desencrip.init(Cipher.DECRYPT_MODE, clave);
-            escribirLog("Clave cargada");
-        } catch (Exception ex) {
-            EscribirEnChat("Error al cargar claves", true);
-            ex.printStackTrace();
+        if (!archivo.exists()) {
+            archivo.mkdir();
         }
-        }else EscribirEnChat("Faltan claves de encriptación, descaguelas o copielas manualmente\n en \\Claves y reinicie el cliente (desde la misma ubicación en el servidor)", true);
+        File archivoClave = new File("Clave\\clave.key");
+        if (archivoClave.exists()) {
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivoClave));
+                Key clave = (Key) ois.readObject();
+                encrip = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                desencrip = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                encrip.init(Cipher.ENCRYPT_MODE, clave);
+                desencrip.init(Cipher.DECRYPT_MODE, clave);
+                escribirLog("Clave cargada");
+            } catch (Exception ex) {
+                EscribirEnChat("Error al cargar claves", true);
+                ex.printStackTrace();
+            }
+        } else {
+            EscribirEnChat("Faltan claves de encriptación, descaguelas o copielas manualmente\n en \\Claves y reinicie el cliente (desde la misma ubicación en el servidor)", true);
+        }
     }
-    private void enviarMensajeAServidor(String texto){
-        try{
+
+    /**
+     * Este metodo envia los mensajes al cliente, pero primero los encripta.
+     *
+     * Este metodo me dio muchisimos problemas, porque el Cipher con decode pide
+     * que el byte[] sea de un tamaño multiplo de 16 o algo así. intenté
+     * mediante varios metodos hacer que fuese así y no encontré solución así
+     * que busqué en internet otras formas de cifrar. Encontré Base64 que aunque
+     * no es un cifrado como tal, convierte byte[] a un string enviable por UTF
+     * y del mismo modo en el otro lado lo convierte de nuevo en byte[]
+     * conservando el cifrado. es una encapsulacion: base64(cifrado(mensaje))
+     *
+     * @param texto el texto a enviar
+     */
+    private void enviarMensajeAServidor(String texto) {
+        try {
             dos.writeUTF(Base64.getEncoder().encodeToString(encrip.doFinal(texto.getBytes())));
             dos.flush();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             System.out.println("Error al enviar mensaje");
         }
     }

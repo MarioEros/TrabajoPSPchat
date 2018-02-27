@@ -21,17 +21,21 @@ public class HiloClienteReceptor extends Thread {
     private DataInputStream dis;
     private Cipher desencrip;
 
-    public HiloClienteReceptor(VentanaCliente ven, Socket socket, DataInputStream dis,Cipher desencrip) {
+    public HiloClienteReceptor(VentanaCliente ven, Socket socket, DataInputStream dis, Cipher desencrip) {
         this.ven = ven;
         this.socket = socket;
         this.dis = dis;
-        this.desencrip=desencrip;
+        this.desencrip = desencrip;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
+                //Realiza aqui la desencriptacion del string
+                //lee el String, Base64 lo convierte en byte[],
+                //el Cipher lo transforma en byte[] sin cifrar y
+                //new String lo convierte en texto
                 String mensaje = new String(desencrip.doFinal(Base64.getDecoder().decode(dis.readUTF())));
                 if (mensaje.equals("*/QUIT*")) {
                     ven.MensajesConsola("Conexion cerrada desde el Servidor.");

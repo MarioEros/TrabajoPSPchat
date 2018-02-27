@@ -23,6 +23,7 @@ public class HiloClienteArchivos extends Thread {
     private FileOutputStream fosescribir;
     private VentanaCliente ven;
     private Archivos file;
+    //Variables que contaran los archivos actualizados.
     private int envi;
     private int recib;
 
@@ -35,14 +36,17 @@ public class HiloClienteArchivos extends Thread {
     public void run() {
         try {
             ven.barraEstado("Esperando a conectarse al servidor...");
+            //Creamos el socket y los Streams el socket para ficheros tiene otro puerto
             socket = new Socket("localhost", VentanaCliente.NUM_PUERTO_FICH);
             ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
             ven.barraEstado("Esperando Estructura...");
+            //Leemos el Archivos que tiene el contenido de la carpeta a compartir
             Archivos nuevo = (Archivos) ois.readObject();
-            ven.escribirLog("Sincronizando archivos desde "+nuevo.getName());
+            ven.escribirLog("Sincronizando archivos desde " + nuevo.getName());
             ven.barraEstado(nuevo.getName());
             ArrayList<Archivos> archis = nuevo.getArchivos();
+            //comprobamos el contenido
             comprobarArchivos(archis);
             ois.close();
             oos.close();
@@ -55,9 +59,11 @@ public class HiloClienteArchivos extends Thread {
     }
 
     private void comprobarArchivos(ArrayList<Archivos> archis) {
-        envi=0;
-        recib=0;
-        int borrados=0;
+        //Ponemos a 0 las variables
+        envi = 0;
+        recib = 0;
+        int borrados = 0;
+        //Contamos los archivos para ponerlo en la barra de estado
         int totalArchivos = archis.size();
         ven.barraEstado("Actualizando " + totalArchivos + " archivos.");
         ArrayList<Archivos> archivosServer = archis;
@@ -67,6 +73,7 @@ public class HiloClienteArchivos extends Thread {
             archivosServer.forEach(a -> {
                 if (archivosPropios.contains(a)) {
                     Archivos b = archivosPropios.get(archivosPropios.indexOf(a));
+                    //si la fecha de a es mayor, se recibe el archivo
                     if (a.getLastModified() > b.getLastModified()) {
                         try {
                             oos.writeInt(1);
@@ -75,6 +82,7 @@ public class HiloClienteArchivos extends Thread {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
+                        //si la fecha de b es mayor, se envia el archivo
                     } else if (a.getLastModified() < b.getLastModified()) {
                         try {
                             oos.writeInt(2);
@@ -84,6 +92,8 @@ public class HiloClienteArchivos extends Thread {
                             ex.printStackTrace();
                         }
                     }
+                    //si ambas son iguales no se hace nada
+                    //si el cliente no tiene el fichero, se recibe el archivo
                 } else {
                     try {
                         oos.writeInt(1);
@@ -95,12 +105,15 @@ public class HiloClienteArchivos extends Thread {
                 }
             });
         }
+        //se envia el numero que indica que ha finalizado
         try {
             oos.writeInt(3);
             oos.flush();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        //ahora si el cliente tiene archivos, comprueba que todos estén en el servidor
+        //si no están estos se borran.
         if (!archivosPropios.isEmpty()) {
             for (int i = archivosPropios.size() - 1; i >= 0; i--) {
                 if (!archivosServer.contains(archivosPropios.get(i))) {
@@ -110,12 +123,16 @@ public class HiloClienteArchivos extends Thread {
                     borrados++;
                 }
             }
-        }if(recib==0&&envi==0)
-            ven.barraEstado("Los archivos están actualizados. "+(borrados==0?"": borrados+" archivo/s borrados."));
-            else
-                ven.barraEstado(recib+" archivo/s recibidos, "+envi+" archivos enviado/s. "+(borrados==0?"": borrados+" archivo/s borrados."));
+        }
+        //se actualiza la barra de estado de ficheros.
+        if (recib == 0 && envi == 0) {
+            ven.barraEstado("Los archivos están actualizados. " + (borrados == 0 ? "" : borrados + " archivo/s borrados."));
+        } else {
+            ven.barraEstado(recib + " archivo/s recibidos, " + envi + " archivos enviado/s. " + (borrados == 0 ? "" : borrados + " archivo/s borrados."));
+        }
     }
 
+    //Enviamos el Archivos que representa el File a enviar y luego se envia el File.
     private void enviarArchivo(Archivos archivo) {
         //Enviamos el File que corresponde a al Archivo correspondiente
         try {
@@ -131,8 +148,8 @@ public class HiloClienteArchivos extends Thread {
         }
     }
 
+    //Enviamos el Archivos que queremos recibir y luego se recibe el File
     private void recibirArchivo(Archivos archivo) {
-        
         //Creamos File correspondiente a al Archivo y recibimos el File.
         try {
             oos.writeObject(archivo);
@@ -140,6 +157,8 @@ public class HiloClienteArchivos extends Thread {
             File salida = new File(file.getAbsolutePath() + "\\" + archivo.getName());
             File leido = (File) ois.readObject();
             fisleer = new FileInputStream(leido);
+            //Leemos del File recibido y escribimos en el de
+            //salida mediante un buffer
             fosescribir = new FileOutputStream(salida);
             byte[] buffer = new byte[1024];
             int length;

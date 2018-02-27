@@ -1,0 +1,16 @@
+27.02.18 08:33:32-->Servidor iniciado
+27.02.18 08:33:32-->Clave cargada
+27.02.18 08:33:42-->Mario logeado.
+27.02.18 08:33:52-->Cliente desconectado.
+27.02.18 08:33:58-->Carlo logeado.
+27.02.18 08:34:13-->Cliente desconectado
+27.02.18 08:34:13-->Servidor cerrado
+27.02.18 09:09:06-->Servidor iniciado
+27.02.18 09:09:06-->Clave cargada
+27.02.18 09:09:41-->Cliente desconectado
+27.02.18 09:09:41-->Servidor cerrado
+27.02.18 09:52:28-->Servidor iniciado
+27.02.18 09:52:28-->Clave cargada
+27.02.18 09:52:38-->Mario logeado.
+27.02.18 09:52:47-->Cliente desconectado
+27.02.18 09:52:47-->Servidor cerrado
